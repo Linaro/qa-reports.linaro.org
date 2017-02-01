@@ -1,0 +1,11 @@
+#!/bin/sh
+
+basedir=$(dirname $0)
+passwd_file=$basedir/secrets/vault.gpg
+
+if [ ! -f $passwd_file ]; then
+  # create a new password file
+  openssl rand -hex 32 | gpg --encrypt --output $passwd_file
+fi
+
+gpg --quiet --batch --use-agent --decrypt $passwd_file
