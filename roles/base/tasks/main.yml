@@ -1,2 +1,5 @@
 - name: Install base packages
-  apt: pkg=virtualenv
+  apt: pkg={{item}} state=installed update-cache=yes
+  with_items:
+    - python3
+    - python-virtualenv
