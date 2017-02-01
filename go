@@ -1,13 +1,19 @@
 #!/bin/sh
 
-set -exu
+set -eu
 
-latest_git_tag=$(git tag | sort -V | tail -1)
+if [ $# -ne 1 ]; then
+    echo "usage: $0 staging|production"
+    exit 1
+fi
+
+env="$1"
 
 basedir=$(dirname $0)
 exec ansible-playbook \
     --vault-password-file=$basedir/vault-passwd \
     --inventory-file=$basedir/hosts \
     --verbose \
-    --extra-vars=latest_git_tag=${latest_git_tag} \
-    "$@"
+    --become --ask-become-pass \
+    -l "$env" \
+    site.yml
