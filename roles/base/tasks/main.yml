@@ -3,3 +3,6 @@
   with_items:
     - python3
     - python-virtualenv
+    - postgresql
+    - supervisor
+    - apache2
