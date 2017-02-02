@@ -1,5 +1,5 @@
 ---
-- name: Configure qa-reports.linaro.org
+- name: Configure service
   hosts: all
   roles:
     - base

@@ -1,2 +1,5 @@
 [production]
 qa-reports.linaro.org
+
+[dev]
+qa-reports.local
