@@ -1,0 +1,5 @@
+- name: create virtualenv
+  command: virtualenv --python=/usr/bin/python3 {{install_base}}
+
+- name: Install squad
+  command: "{{install_base}}/bin/pip install -U squad{{squad_version}} psycopg2"

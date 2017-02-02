@@ -1,0 +1,2 @@
+install_base: /srv/{{inventory_hostname}}
+squad_version:
