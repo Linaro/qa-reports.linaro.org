@@ -11,8 +11,8 @@ env="$1"
 basedir=$(dirname $0)
 
 if [ "$env" = 'dev' ] && [ -d .vagrant ]; then
-    key=$(find .vagrant/ -name private_key)
-    extra_arg="--ssh-common-args=-o User=vagrant -i $key"
+    vagrant ssh-config | sed -e 's/^Host.*/Host qa-reports.local/'> .vagrant/ssh_config
+    extra_arg="--ssh-common-args=-F .vagrant/ssh_config"
 else
     extra_arg='--ask-become-pass'
 fi
