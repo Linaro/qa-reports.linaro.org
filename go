@@ -2,12 +2,13 @@
 
 set -eu
 
-if [ $# -ne 1 ]; then
-    echo "usage: $0 dev|staging|production"
+if [ $# -lt 1 ]; then
+    echo "usage: $0 dev|staging|production [ansible-opts]"
     exit 1
 fi
 
 env="$1"
+shift
 basedir=$(dirname $0)
 
 if [ "$env" = 'dev' ] && [ -d .vagrant ]; then
@@ -26,4 +27,5 @@ exec ansible-playbook \
     --become \
     -l "$env" \
     "$extra_arg" \
+    "$@" \
     site.yml
