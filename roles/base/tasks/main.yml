@@ -7,6 +7,5 @@
     - python-virtualenv
     - postgresql
     - libpq-dev
-    - supervisor
     - apache2
     - libapache2-mod-wsgi
