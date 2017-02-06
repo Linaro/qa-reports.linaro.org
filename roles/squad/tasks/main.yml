@@ -39,3 +39,25 @@
 - command: systemctl enable squad.service
 
 - command: systemctl restart squad.service
+
+- file:
+    path: "{{install_base}}/www"
+    owner: root
+    group: root
+    mode: 0444
+    state: directory
+
+- command: a2enmod proxy proxy_balancer lbmethod_byrequests proxy_http rewrite
+  register: result
+  changed_when: "'Enabling module' in result.stdout"
+  notify: reload-apache2
+
+- template:
+    src: roles/squad/templates/apache2.conf
+    dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
+  notify: reload-apache2
+
+- command: a2ensite {{inventory_hostname}}
+  register: result
+  changed_when: "'Enabling site' in result.stdout"
+  notify: reload-apache2

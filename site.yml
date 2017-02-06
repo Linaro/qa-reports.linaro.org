@@ -7,3 +7,5 @@
   handlers:
     - name: reload-systemd
       command: systemctl daemon-reload
+    - name: reload-apache2
+      command: systemctl reload apache2
