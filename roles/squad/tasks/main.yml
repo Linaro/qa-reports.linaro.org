@@ -19,6 +19,15 @@
     mode: 0755
     state: directory
 
+- postgresql_user:
+    name: squad
+  become_user: postgres
+
+- postgresql_db:
+    name: squad
+    owner: squad
+  become_user: postgres
+
 - name: systemd service
   template:
     src: roles/squad/templates/squad.service

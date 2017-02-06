@@ -9,6 +9,7 @@ PrivateTmp=yes
 WorkingDirectory={{install_base}}
 ExecStart={{install_base}}/bin/squad
 Environment=XDG_DATA_HOME={{install_base}}/data
+Environment=DATABASE=ENGINE=django.db.backends.postgresql_psycopg2:NAME=squad
 Restart=on-failure
 RestartSec=5
 

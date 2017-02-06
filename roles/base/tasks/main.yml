@@ -5,6 +5,7 @@
     - python3
     - python3-dev
     - python-virtualenv
+    - python-psycopg2
     - postgresql
     - libpq-dev
     - apache2
