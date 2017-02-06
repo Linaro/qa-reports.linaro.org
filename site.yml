@@ -4,3 +4,6 @@
   roles:
     - base
     - squad
+  handlers:
+    - name: reload-systemd
+      command: systemctl daemon-reload

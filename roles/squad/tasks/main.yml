@@ -1,5 +1,32 @@
 - name: create virtualenv
   command: virtualenv --python=/usr/bin/python3 {{install_base}}
+  args:
+    creates: "{{install_base}}/bin/python3"
 
 - name: Install squad
   command: "{{install_base}}/bin/pip install -U squad{{squad_version}} psycopg2"
+
+- user:
+    name: squad
+    home: "{{install_base}}"
+    createhome: no
+
+- name: data directory
+  file:
+    path: "{{install_base}}/data"
+    owner: squad
+    group: squad
+    mode: 0755
+    state: directory
+
+- name: systemd service
+  template:
+    src: roles/squad/templates/squad.service
+    dest: /etc/systemd/system/squad.service
+  notify: reload-systemd
+
+- meta: flush_handlers
+
+- command: systemctl enable squad.service
+
+- command: systemctl restart squad.service
