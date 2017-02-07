@@ -9,6 +9,9 @@ fi
 
 env="$1"
 shift
+if [ $# -eq 0 ]; then
+    set -- 'site.yml'
+fi
 basedir=$(dirname $0)
 
 if [ "$env" = 'dev' ] && [ -d .vagrant ]; then
@@ -27,5 +30,4 @@ exec ansible-playbook \
     --become \
     -l "$env" \
     "$extra_arg" \
-    "$@" \
-    site.yml
+    "$@"

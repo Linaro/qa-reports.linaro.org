@@ -1,7 +1,28 @@
-# example: deploy to staging
+# deploy to production
 
-./go staging
+first deploy SSL (only needed in the very first time, or if the SSL setup
+changed:
 
-# example: deploy to production
+```
+./go production ssl.yml
+```
 
+Then do the rest of the deployment:
+
+```
 ./go production
+```
+
+# deploy to development environment
+
+start VM
+
+```
+vagrant up
+```
+
+then deploy
+
+```
+./go dev
+```
