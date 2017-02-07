@@ -1,7 +1,7 @@
 # deploy to production
 
 first deploy SSL (only needed in the very first time, or if the SSL setup
-changed:
+changed):
 
 ```
 ./go production ssl.yml
