@@ -8,9 +8,7 @@ Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
 ExecStart={{install_base}}/bin/squad
-Environment=XDG_DATA_HOME={{install_base}}/data
-Environment=DATABASE=ENGINE=django.db.backends.postgresql_psycopg2:NAME=squad
-Environment=SQUAD_EXTRA_SETTINGS={{install_base}}/linaro_ldap.py
+EnvironmentFile={{install_base}}/environment
 Restart=on-failure
 RestartSec=5
 

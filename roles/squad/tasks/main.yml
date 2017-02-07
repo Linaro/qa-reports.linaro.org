@@ -26,6 +26,22 @@
     name: squad
     home: "{{install_base}}"
     createhome: no
+    shell: /bin/bash
+
+- name: environment file
+  template:
+    src: roles/squad/templates/environment
+    dest: '{{install_base}}/environment'
+
+- name: .bashrc
+  template:
+    src: roles/squad/templates/bashrc
+    dest: '{{install_base}}/.bashrc'
+
+- name: .bash_profile
+  template:
+    src: roles/squad/templates/bash_profile
+    dest: '{{install_base}}/.bash_profile'
 
 - name: data directory
   file:
@@ -62,7 +78,7 @@
     path: "{{install_base}}/www"
     owner: root
     group: root
-    mode: 0444
+    mode: 0555
     state: directory
 
 - command: a2enmod proxy proxy_balancer lbmethod_byrequests proxy_http rewrite ssl

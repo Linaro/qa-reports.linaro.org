@@ -1,0 +1,6 @@
+source {{install_base}}/bin/activate
+source {{install_base}}/environment
+
+for var in $(cut -d = -f 1 {{install_base}}/environment); do
+	export "$var"
+done
