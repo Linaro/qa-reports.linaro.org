@@ -8,5 +8,7 @@
     - python-psycopg2
     - postgresql
     - libpq-dev
+    - libldap2-dev
+    - libsasl2-dev
     - apache2
     - libapache2-mod-wsgi

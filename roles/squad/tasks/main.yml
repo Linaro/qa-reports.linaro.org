@@ -9,6 +9,19 @@
   changed_when: "('up-to-date: squad' not in install_squad.stdout) and
                 ('up-to-date: psycopg2' not in install_squad.stdout)"
 
+- name: install Django ldap auth module
+  command: "{{install_base}}/bin/pip install -U django-auth-ldap"
+  register: install_django_ldap
+  changed_when: "'up-to-date: django-auth-ldap' not in install_django_ldap.stdout"
+
+- name: install Linaro LDAP settings file
+  copy:
+    src: secrets/linaro_ldap.py
+    dest: "{{install_base}}/linaro_ldap.py"
+    owner: root
+    group: squad
+    mode: 0640
+
 - user:
     name: squad
     home: "{{install_base}}"
