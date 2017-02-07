@@ -5,6 +5,9 @@
 
 - name: Install squad
   command: "{{install_base}}/bin/pip install -U squad{{squad_version}} psycopg2"
+  register: install_squad
+  changed_when: "('up-to-date: squad' not in install_squad.stdout) and
+                ('up-to-date: psycopg2' not in install_squad.stdout)"
 
 - user:
     name: squad
@@ -37,8 +40,10 @@
 - meta: flush_handlers
 
 - command: systemctl enable squad.service
+  changed_when: False
 
 - command: systemctl restart squad.service
+  changed_when: False
 
 - file:
     path: "{{install_base}}/www"
@@ -55,6 +60,7 @@
 - name: detect SSL cert
   shell: "ls -1d /var/lib/dehydrated/certs/{{inventory_hostname}} || true"
   register: ssl
+  changed_when: False
 
 - name: apache2 config (no SSL)
   template:
