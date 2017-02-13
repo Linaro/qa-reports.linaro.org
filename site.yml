@@ -4,6 +4,7 @@
   roles:
     - base
     - squad
+    - squad-lava-listener
   handlers:
     - name: reload-systemd
       command: systemctl daemon-reload

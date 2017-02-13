@@ -1,0 +1,3 @@
+DB_PATH={{lava_listener_install_base}}/data/db.sqlite3
+DJANGO_SETTINGS_MODULE=localsettings
+SECRET_KEY_FILE={{lava_listener_install_base}}/data/secret.txt

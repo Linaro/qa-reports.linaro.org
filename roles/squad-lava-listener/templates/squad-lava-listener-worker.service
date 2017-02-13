@@ -1,0 +1,15 @@
+[Unit]
+Description=SQUAD Lava Listener: worker
+
+[Service]
+User=squad-lava-listener
+Group=squad-lava-listener
+PrivateTmp=yes
+WorkingDirectory={{lava_listener_install_base}}/code
+ExecStart={{lava_listener_install_base}}/bin/python manage.py celery worker
+EnvironmentFile={{lava_listener_install_base}}/environment
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

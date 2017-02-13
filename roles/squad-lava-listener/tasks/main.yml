@@ -1,0 +1,112 @@
+- name: create virtualenv
+  command: virtualenv --python=/usr/bin/python2 {{lava_listener_install_base}}
+  args:
+    creates: "{{lava_listener_install_base}}/bin/python"
+
+- name: get latest git tag
+  uri:
+    url: https://api.github.com/repos/Linaro/squad-lava-listener/tags
+  register: tags
+
+- git:
+    repo: https://github.com/Linaro/squad-lava-listener.git
+    dest: "{{lava_listener_install_base}}/code"
+    version: "{{tags.json[0].name}}"
+
+- name: install requirements
+  command: "{{lava_listener_install_base}}/bin/pip install -r requirements.txt"
+  register: pip_install
+  changed_when: "'Installing' in pip_install.stdout"
+  args:
+    chdir: "{{lava_listener_install_base}}/code"
+
+- user:
+    name: squad-lava-listener
+    home: "{{lava_listener_install_base}}"
+    createhome: no
+    shell: /bin/bash
+
+- template:
+    src: roles/squad-lava-listener/templates/environment
+    dest: "{{lava_listener_install_base}}/environment"
+
+- name: .bashrc
+  template:
+    src: roles/squad/templates/bashrc
+    dest: '{{lava_listener_install_base}}/.bashrc'
+
+- name: .bash_profile
+  template:
+    src: roles/squad/templates/bash_profile
+    dest: '{{lava_listener_install_base}}/.bash_profile'
+
+- file:
+    path: '{{lava_listener_install_base}}/data'
+    state: directory
+    owner: root
+    group: squad-lava-listener
+    mode: 0775
+
+- name: secrets
+  copy:
+    src: secrets/squad_lava_secrets.py
+    dest: '{{lava_listener_install_base}}/code/squad_lava_secrets.py'
+    owner: root
+    group: squad-lava-listener
+    mode: 0640
+
+- name: secret key
+  shell: 'openssl rand -hex 64 > {{lava_listener_install_base}}/data/secret.txt'
+  args:
+    creates: '{{lava_listener_install_base}}/data/secret.txt'
+
+- name: local Django settings
+  copy:
+    src: roles/squad-lava-listener/templates/localsettings.py
+    dest: '{{lava_listener_install_base}}/code/localsettings.py'
+
+- name: migrate database
+  shell: ". {{lava_listener_install_base}}/.bashrc && {{lava_listener_install_base}}/bin/python manage.py migrate"
+  become_user: squad-lava-listener
+  register: migrate
+  changed_when: '"No migrations to apply" not in migrate.stdout'
+  args:
+    chdir: "{{lava_listener_install_base}}/code"
+
+- name: systemd service - web frontend
+  template:
+    src: roles/squad-lava-listener/templates/squad-lava-listener-web.service
+    dest: /etc/systemd/system/squad-latest-listener-web.service
+  notify: reload-systemd
+
+- name: systemd service - worker
+  template:
+    src: roles/squad-lava-listener/templates/squad-lava-listener-worker.service
+    dest: /etc/systemd/system/squad-latest-listener-worker.service
+  notify: reload-systemd
+
+- name: systemd service - listener
+  template:
+    src: roles/squad-lava-listener/templates/squad-lava-listener-listener.service
+    dest: /etc/systemd/system/squad-latest-listener-listener.service
+  notify: reload-systemd
+
+- meta: flush_handlers
+
+- command: systemctl enable squad-latest-listener-web.service
+  changed_when: False
+
+- command: systemctl restart squad-latest-listener-web.service
+  changed_when: False
+
+- command: systemctl enable squad-latest-listener-worker.service
+  changed_when: False
+
+- command: systemctl restart squad-latest-listener-worker.service
+  changed_when: False
+
+- command: systemctl enable squad-latest-listener-listener.service
+  changed_when: False
+
+- command: systemctl restart squad-latest-listener-listener.service
+  changed_when: False

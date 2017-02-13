@@ -1,0 +1,15 @@
+[Unit]
+Description=SQUAD Lava Listener: web frontend
+
+[Service]
+User=squad-lava-listener
+Group=squad-lava-listener
+PrivateTmp=yes
+WorkingDirectory={{lava_listener_install_base}}/code
+ExecStart={{lava_listener_install_base}}/bin/gunicorn squadlavalistener.wsgi --log-file=- --log-level=debug --bind=127.0.0.1:8001
+EnvironmentFile={{lava_listener_install_base}}/environment
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

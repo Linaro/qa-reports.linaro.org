@@ -1,6 +1,6 @@
-source {{install_base}}/bin/activate
-source {{install_base}}/environment
+. ~/bin/activate
+. ~/environment
 
-for var in $(cut -d = -f 1 {{install_base}}/environment); do
+for var in $(cut -d = -f 1 ~/environment); do
 	export "$var"
 done
