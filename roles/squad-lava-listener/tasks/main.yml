@@ -95,39 +95,39 @@
 - name: systemd service - web frontend
   template:
     src: roles/squad-lava-listener/templates/squad-lava-listener-web.service
-    dest: /etc/systemd/system/squad-latest-listener-web.service
+    dest: /etc/systemd/system/squad-lava-listener-web.service
   notify: reload-systemd
 
 - name: systemd service - worker
   template:
     src: roles/squad-lava-listener/templates/squad-lava-listener-worker.service
-    dest: /etc/systemd/system/squad-latest-listener-worker.service
+    dest: /etc/systemd/system/squad-lava-listener-worker.service
   notify: reload-systemd
 
 - name: systemd service - listener
   template:
     src: roles/squad-lava-listener/templates/squad-lava-listener-listener.service
-    dest: /etc/systemd/system/squad-latest-listener-listener.service
+    dest: /etc/systemd/system/squad-lava-listener-listener.service
   notify: reload-systemd
 
 - meta: flush_handlers
 
-- command: systemctl enable squad-latest-listener-web.service
+- command: systemctl enable squad-lava-listener-web.service
   changed_when: False
 
-- command: systemctl restart squad-latest-listener-web.service
+- command: systemctl restart squad-lava-listener-web.service
   changed_when: False
 
-- command: systemctl enable squad-latest-listener-worker.service
+- command: systemctl enable squad-lava-listener-worker.service
   changed_when: False
 
-- command: systemctl restart squad-latest-listener-worker.service
+- command: systemctl restart squad-lava-listener-worker.service
   changed_when: False
 
-- command: systemctl enable squad-latest-listener-listener.service
+- command: systemctl enable squad-lava-listener-listener.service
   changed_when: False
 
-- command: systemctl restart squad-latest-listener-listener.service
+- command: systemctl restart squad-lava-listener-listener.service
   changed_when: False
 
 - file:
