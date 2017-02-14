@@ -1,7 +1,7 @@
 - name: create virtualenv
-  command: virtualenv --python=/usr/bin/python2 {{lava_listener_install_base}}
+  command: virtualenv --python=/usr/bin/python3 {{lava_listener_install_base}}
   args:
-    creates: "{{lava_listener_install_base}}/bin/python"
+    creates: "{{lava_listener_install_base}}/bin/python3"
 
 - name: get latest git tag
   uri:
