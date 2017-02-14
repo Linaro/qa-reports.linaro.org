@@ -3,6 +3,7 @@ from squadlavalistener.settings import *
 
 # general settings
 DEBUG = False
+ALLOWED_HOSTS = ['*']
 
 # Linaro-specific settings
 LAVA_LISTENERS = [

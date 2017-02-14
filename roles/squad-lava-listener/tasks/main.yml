@@ -110,3 +110,29 @@
 
 - command: systemctl restart squad-latest-listener-listener.service
   changed_when: False
+
+- file:
+    path: "{{lava_listener_install_base}}/www"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: apache2 config (no SSL)
+  template:
+    src: roles/squad-lava-listener/templates/apache2.conf
+    dest: /etc/apache2/sites-available/lava.{{inventory_hostname}}.conf
+  notify: reload-apache2
+  when: "'{{inventory_hostname}}' not in ssl.stdout"
+
+- name: apache2 config (SSL)
+  template:
+    src: roles/squad-lava-listener/templates/apache2-ssl.conf
+    dest: /etc/apache2/sites-available/lava.{{inventory_hostname}}.conf
+  notify: reload-apache2
+  when: "'{{inventory_hostname}}' in ssl.stdout"
+
+- command: a2ensite lava.{{inventory_hostname}}
+  register: result
+  changed_when: "'Enabling site' in result.stdout"
+  notify: reload-apache2
