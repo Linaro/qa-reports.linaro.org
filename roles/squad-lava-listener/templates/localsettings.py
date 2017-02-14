@@ -4,6 +4,7 @@ from squadlavalistener.settings import *
 # general settings
 DEBUG = False
 ALLOWED_HOSTS = ['*']
+STATIC_ROOT = "{{lava_listener_install_base}}/www/static"
 
 # Linaro-specific settings
 LAVA_LISTENERS = [

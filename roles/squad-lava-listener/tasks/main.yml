@@ -74,7 +74,7 @@
     mode: 0640
 
 - name: local Django settings
-  copy:
+  template:
     src: roles/squad-lava-listener/templates/localsettings.py
     dest: '{{lava_listener_install_base}}/code/localsettings.py'
 
@@ -83,6 +83,12 @@
   become_user: squad-lava-listener
   register: migrate
   changed_when: '"No migrations to apply" not in migrate.stdout'
+  args:
+    chdir: "{{lava_listener_install_base}}/code"
+
+- name: collect static files
+  shell: ". {{lava_listener_install_base}}/environment; for var in $(cut -d = -f 1 {{lava_listener_install_base}}/environment); do export $var; done; {{lava_listener_install_base}}/bin/python manage.py collectstatic --no-input"
+  changed_when: False
   args:
     chdir: "{{lava_listener_install_base}}/code"
 
