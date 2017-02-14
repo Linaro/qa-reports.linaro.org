@@ -14,3 +14,13 @@
     - libapache2-mod-wsgi
     - rabbitmq-server
     - git
+
+- command: a2enmod proxy proxy_balancer lbmethod_byrequests proxy_http rewrite ssl
+  register: result
+  changed_when: "'Enabling module' in result.stdout"
+  notify: reload-apache2
+
+- name: detect SSL cert
+  shell: "ls -1d /var/lib/dehydrated/certs/{{inventory_hostname}} || true"
+  register: ssl
+  changed_when: False
