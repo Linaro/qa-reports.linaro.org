@@ -20,6 +20,11 @@
   args:
     chdir: "{{lava_listener_install_base}}/code"
 
+- name: install Django ldap auth module
+  command: "{{lava_listener_install_base}}/bin/pip install -U django-auth-ldap"
+  register: install_django_ldap
+  changed_when: "'up-to-date: django-auth-ldap' not in install_django_ldap.stdout"
+
 - user:
     name: squad-lava-listener
     home: "{{lava_listener_install_base}}"
@@ -59,6 +64,14 @@
   shell: 'openssl rand -hex 64 > {{lava_listener_install_base}}/data/secret.txt'
   args:
     creates: '{{lava_listener_install_base}}/data/secret.txt'
+
+- name: Linaro LDAP settings file
+  copy:
+    src: secrets/linaro_ldap.py
+    dest: "{{lava_listener_install_base}}/code/linaro_ldap.py"
+    owner: root
+    group: squad-lava-listener
+    mode: 0640
 
 - name: local Django settings
   copy:

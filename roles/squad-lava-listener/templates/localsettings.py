@@ -17,4 +17,5 @@ SQUAD_URL = "https://art-reports.linaro.org"
 
 # load secrets from a separate file
 from squad_lava_secrets import *
+from linaro_ldap import *
 SECRET_KEY = open(os.getenv('SECRET_KEY_FILE')).read().strip()
