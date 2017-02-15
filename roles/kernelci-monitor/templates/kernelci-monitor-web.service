@@ -1,0 +1,15 @@
+[Unit]
+Description=KernelCI Monitor: web frontend
+
+[Service]
+User=kernelci-monitor
+Group=kernelci-monitor
+PrivateTmp=yes
+WorkingDirectory={{kernelci_monitor_install_base}}/code
+ExecStart={{kernelci_monitor_install_base}}/bin/gunicorn kernelcimonitor.wsgi --log-file=- --log-level=debug --bind=127.0.0.1:8002
+EnvironmentFile={{kernelci_monitor_install_base}}/environment
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

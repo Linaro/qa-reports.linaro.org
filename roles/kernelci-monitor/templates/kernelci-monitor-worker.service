@@ -1,0 +1,15 @@
+[Unit]
+Description=KernelCI Monitor: worker
+
+[Service]
+User=kernelci-monitor
+Group=kernelci-monitor
+PrivateTmp=yes
+WorkingDirectory={{kernelci_monitor_install_base}}/code
+ExecStart={{kernelci_monitor_install_base}}/bin/python manage.py celery worker
+EnvironmentFile={{kernelci_monitor_install_base}}/environment
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
