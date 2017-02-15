@@ -6,6 +6,7 @@
     - python3-dev
     - python-virtualenv
     - python-psycopg2
+    - python-httplib2
     - postgresql
     - libpq-dev
     - libldap2-dev

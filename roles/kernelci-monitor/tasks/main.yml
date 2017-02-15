@@ -1,0 +1,145 @@
+- name: create virtualenv
+  command: virtualenv --python=/usr/bin/python3 {{kernelci_monitor_install_base}}
+  args:
+    creates: "{{kernelci_monitor_install_base}}/bin/python3"
+
+- name: get latest git tag
+  uri:
+    url: https://api.github.com/repos/Linaro/kernelci-monitor/tags
+  register: tags
+
+- git:
+    repo: https://github.com/Linaro/kernelci-monitor.git
+    dest: "{{kernelci_monitor_install_base}}/code"
+    version: "{{tags.json[0].name}}"
+
+- name: install requirements
+  command: "{{kernelci_monitor_install_base}}/bin/pip install -r requirements.txt"
+  register: pip_install
+  changed_when: "'Installing' in pip_install.stdout"
+  args:
+    chdir: "{{kernelci_monitor_install_base}}/code"
+
+- name: install Django ldap auth module
+  command: "{{kernelci_monitor_install_base}}/bin/pip install -U django-auth-ldap"
+  register: install_django_ldap
+  changed_when: "'up-to-date: django-auth-ldap' not in install_django_ldap.stdout"
+
+- user:
+    name: kernelci-monitor
+    home: "{{kernelci_monitor_install_base}}"
+    createhome: no
+    shell: /bin/bash
+
+- template:
+    src: roles/kernelci-monitor/templates/environment
+    dest: "{{kernelci_monitor_install_base}}/environment"
+
+- name: .bashrc
+  template:
+    src: roles/squad/templates/bashrc
+    dest: '{{kernelci_monitor_install_base}}/.bashrc'
+
+- name: .bash_profile
+  template:
+    src: roles/squad/templates/bash_profile
+    dest: '{{kernelci_monitor_install_base}}/.bash_profile'
+
+- file:
+    path: '{{kernelci_monitor_install_base}}/data'
+    state: directory
+    owner: root
+    group: kernelci-monitor
+    mode: 0775
+
+- name: secrets
+  copy:
+    src: secrets/kernelci_monitor_secrets.py
+    dest: '{{kernelci_monitor_install_base}}/code/kernelci_monitor_secrets.py'
+    owner: root
+    group: kernelci-monitor
+    mode: 0640
+
+- name: secret key
+  shell: 'openssl rand -hex 64 > {{kernelci_monitor_install_base}}/data/secret.txt'
+  args:
+    creates: '{{kernelci_monitor_install_base}}/data/secret.txt'
+
+- name: Linaro LDAP settings file
+  copy:
+    src: secrets/linaro_ldap.py
+    dest: "{{kernelci_monitor_install_base}}/code/linaro_ldap.py"
+    owner: root
+    group: kernelci-monitor
+    mode: 0640
+
+- name: local Django settings
+  template:
+    src: roles/kernelci-monitor/templates/localsettings.py
+    dest: '{{kernelci_monitor_install_base}}/code/localsettings.py'
+
+- name: migrate database
+  shell: ". {{kernelci_monitor_install_base}}/.bashrc && {{kernelci_monitor_install_base}}/bin/python manage.py migrate"
+  become_user: kernelci-monitor
+  register: migrate
+  changed_when: '"No migrations to apply" not in migrate.stdout'
+  args:
+    chdir: "{{kernelci_monitor_install_base}}/code"
+
+- name: collect static files
+  shell: ". {{kernelci_monitor_install_base}}/environment; for var in $(cut -d = -f 1 {{kernelci_monitor_install_base}}/environment); do export $var; done; {{kernelci_monitor_install_base}}/bin/python manage.py collectstatic --no-input"
+  changed_when: False
+  args:
+    chdir: "{{kernelci_monitor_install_base}}/code"
+
+- name: systemd service - web frontend
+  template:
+    src: roles/kernelci-monitor/templates/kernelci-monitor-web.service
+    dest: /etc/systemd/system/kernelci-monitor-web.service
+  notify: reload-systemd
+
+- name: systemd service - worker
+  template:
+    src: roles/kernelci-monitor/templates/kernelci-monitor-worker.service
+    dest: /etc/systemd/system/kernelci-monitor-worker.service
+  notify: reload-systemd
+
+- meta: flush_handlers
+
+- command: systemctl enable kernelci-monitor-web.service
+  changed_when: False
+
+- command: systemctl restart kernelci-monitor-web.service
+  changed_when: False
+
+- command: systemctl enable kernelci-monitor-worker.service
+  changed_when: False
+
+- command: systemctl restart kernelci-monitor-worker.service
+  changed_when: False
+
+- file:
+    path: "{{kernelci_monitor_install_base}}/www"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: apache2 config (no SSL)
+  template:
+    src: roles/kernelci-monitor/templates/apache2.conf
+    dest: /etc/apache2/sites-available/kernelci.{{inventory_hostname}}.conf
+  notify: reload-apache2
+  when: "'{{inventory_hostname}}' not in ssl.stdout"
+
+- name: apache2 config (SSL)
+  template:
+    src: roles/kernelci-monitor/templates/apache2-ssl.conf
+    dest: /etc/apache2/sites-available/kernelci.{{inventory_hostname}}.conf
+  notify: reload-apache2
+  when: "'{{inventory_hostname}}' in ssl.stdout"
+
+- command: a2ensite kernelci.{{inventory_hostname}}
+  register: result
+  changed_when: "'Enabling site' in result.stdout"
+  notify: reload-apache2

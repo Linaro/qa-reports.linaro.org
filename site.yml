@@ -5,6 +5,7 @@
     - base
     - squad
     - squad-lava-listener
+    - kernelci-monitor
   handlers:
     - name: reload-systemd
       command: systemctl daemon-reload
