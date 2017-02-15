@@ -20,13 +20,6 @@
   args:
     chdir: "{{kernelci_monitor_install_base}}/code"
 
-- name: install gunicorn (temporary workaround)
-  command: "{{kernelci_monitor_install_base}}/bin/pip install gunicorn"
-  register: gunicorn_install
-  changed_when: "'up-to-date: gunicorn' not in gunicorn_install.stdout"
-  args:
-    chdir: "{{kernelci_monitor_install_base}}/code"
-
 - name: install Django ldap auth module
   command: "{{kernelci_monitor_install_base}}/bin/pip install -U django-auth-ldap"
   register: install_django_ldap
