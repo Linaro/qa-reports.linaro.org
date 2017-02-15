@@ -14,7 +14,7 @@ LAVA_LISTENERS = [
                 'zmq_topic': 'org.linaro.validation',
             },
 ]
-SQUAD_URL = "https://art-reports.linaro.org"
+SQUAD_URL = "https://qa-reports.linaro.org"
 
 # load secrets from a separate file
 from squad_lava_secrets import *
