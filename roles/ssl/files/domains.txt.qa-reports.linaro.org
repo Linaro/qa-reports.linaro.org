@@ -1,1 +1,1 @@
-qa-reports.linaro.org lava.qa-reports.linaro.org
+qa-reports.linaro.org lava.qa-reports.linaro.org kernelci.qa-reports.linaro.org
