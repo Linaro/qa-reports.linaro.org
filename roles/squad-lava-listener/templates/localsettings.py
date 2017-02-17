@@ -9,15 +9,15 @@ STATIC_ROOT = "{{lava_listener_install_base}}/www/static"
 # Linaro-specific settings
 LAVA_LISTENERS = [
     {
-            'name': 'validation.linaro.org',
-                'zmq_endpoint': 'tcp://staging.validation.linaro.org:5500',
-                'zmq_topic': 'org.linaro.validation.testjob',
-            },
+        'name': 'validation.linaro.org',
+        'zmq_endpoint': 'tcp://staging.validation.linaro.org:5500',
+        'zmq_topic': 'org.linaro.validation.testjob',
+    },
     {
-            'name': 'validation.linaro.org',
-                'zmq_endpoint': 'tcp://validation.linaro.org:5510',
-                'zmq_topic': 'org.linaro.validation.testjob',
-            },
+        'name': 'validation.linaro.org',
+        'zmq_endpoint': 'tcp://validation.linaro.org:5510',
+        'zmq_topic': 'org.linaro.validation.testjob',
+    },
 
 ]
 SQUAD_URL = "https://qa-reports.linaro.org"
