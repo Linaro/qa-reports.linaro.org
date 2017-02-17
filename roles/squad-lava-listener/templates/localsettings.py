@@ -2,7 +2,7 @@
 from squadlavalistener.settings import *
 
 # general settings
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 STATIC_ROOT = "{{lava_listener_install_base}}/www/static"
 

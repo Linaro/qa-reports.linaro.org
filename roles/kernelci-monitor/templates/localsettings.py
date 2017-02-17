@@ -2,7 +2,7 @@
 from kernelcimonitor.settings import *
 
 # general settings
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 STATIC_ROOT = "{{kernelci_monitor_install_base}}/www/static"
 
