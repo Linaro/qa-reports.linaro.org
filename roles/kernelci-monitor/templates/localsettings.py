@@ -16,6 +16,11 @@ SQUADLISTENER_API_URL="http://lava.qa-reports.linaro.org/api/pattern/"
 
 LAVA_XMLRPC_URL="https://staging.validation.linaro.org/RPC2/"
 
+# Should be defined in basic settings, but overwriting here
+# to be sure the names match
+CELERY_QUEUE_NAME="kernelci"
+CELERY_ROUTES = {"monitor.tasks.*": {"queue": CELERY_QUEUE_NAME}}
+
 # load secrets from a separate file
 from kernelci_monitor_secrets import *
 from linaro_ldap import *
