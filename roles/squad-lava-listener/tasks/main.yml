@@ -86,6 +86,22 @@
   args:
     chdir: "{{lava_listener_install_base}}/code"
 
+- name: add rabbitmq vhost
+  rabbitmq_vhost:
+    name: /lava
+    state: present
+
+- name: add rabbitmq user
+  rabbitmq_user:
+    user: lava
+    password: lava
+    permissions:
+      - vhost: /lava
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+    state: present
+
 - name: collect static files
   shell: ". {{lava_listener_install_base}}/environment; for var in $(cut -d = -f 1 {{lava_listener_install_base}}/environment); do export $var; done; {{lava_listener_install_base}}/bin/python manage.py collectstatic --no-input"
   changed_when: False

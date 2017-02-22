@@ -86,6 +86,22 @@
   args:
     chdir: "{{kernelci_monitor_install_base}}/code"
 
+- name: add rabbitmq vhost
+  rabbitmq_vhost:
+    name: /kernelci
+    state: present
+
+- name: add rabbitmq user
+  rabbitmq_user:
+    user: kernelci
+    password: kernelci
+    permissions:
+      - vhost: /kernelci
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+    state: present
+
 - name: collect static files
   shell: ". {{kernelci_monitor_install_base}}/environment; for var in $(cut -d = -f 1 {{kernelci_monitor_install_base}}/environment); do export $var; done; {{kernelci_monitor_install_base}}/bin/python manage.py collectstatic --no-input"
   changed_when: False
