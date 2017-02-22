@@ -24,8 +24,7 @@ SQUAD_URL = "https://qa-reports.linaro.org"
 
 # Should be defined in the basic settings, but overwriting here
 # to make sure names match
-CELERY_QUEUE_NAME="lava"
-CELERY_ROUTES = {"api.tasks.*": {"queue": CELERY_QUEUE_NAME}}
+CELERY_DEFAULT_QUEUE = "lava"
 
 # load secrets from a separate file
 from squad_lava_secrets import *
