@@ -14,7 +14,7 @@ KERNELCI_DATE_RANGE=1
 
 SQUADLISTENER_API_URL="http://lava.qa-reports.linaro.org/api/pattern/"
 
-LAVA_XMLRPC_URL="https://staging.validation.linaro.org/RPC2/"
+LAVA_XMLRPC_URL="https://validation.linaro.org/RPC2/"
 
 # load secrets from a separate file
 from kernelci_monitor_secrets import *
