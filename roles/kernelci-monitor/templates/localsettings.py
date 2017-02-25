@@ -1,3 +1,5 @@
+import sys
+
 # default settings
 from kernelcimonitor.settings import *
 
@@ -20,3 +22,25 @@ LAVA_XMLRPC_URL="https://validation.linaro.org/RPC2/"
 from kernelci_monitor_secrets import *
 from linaro_ldap import *
 SECRET_KEY = open(os.getenv('SECRET_KEY_FILE')).read().strip()
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+	'console': {
+	    'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+	    'class': 'logging.StreamHandler',
+	    'stream': sys.stdout,
+	}
+    },
+    'loggers': {
+	'django': {
+	    'handlers': ['console'],
+	    'propagate': True,
+	    'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+	},
+	'': {
+	    'handlers': ['console'],
+	    'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+	}
+    }
+}
