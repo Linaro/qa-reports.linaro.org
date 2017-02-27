@@ -14,7 +14,7 @@ KERNELCI_API_URL="https://api.kernelci.org/%s/"
 KERNELCI_STORAGE_URL="https://storage.kernelci.org/"
 KERNELCI_DATE_RANGE=1
 
-SQUADLISTENER_API_URL="http://lava.qa-reports.linaro.org/api/pattern/"
+SQUADLISTENER_API_URL="https://lava.qa-reports.linaro.org/api/pattern/"
 
 LAVA_XMLRPC_URL="https://validation.linaro.org/RPC2/"
 
