@@ -25,22 +25,28 @@ SECRET_KEY = open(os.getenv('SECRET_KEY_FILE')).read().strip()
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'myformatter': {
+            'class': 'logging.Formatter',
+            "format": "[%(asctime)s] [%(levelname)s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S %z",
+        },
+    },
     'handlers': {
-	'console': {
-	    'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-	    'class': 'logging.StreamHandler',
-	    'stream': sys.stdout,
-	}
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'myformatter',
+        }
     },
     'loggers': {
-	'django': {
-	    'handlers': ['console'],
-	    'propagate': True,
-	    'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-	},
-	'': {
-	    'handlers': ['console'],
-	    'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-	}
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        '': {
+            'handlers': ['console'],
+            'level': os.getenv('APP_LOG_LEVEL', 'INFO'),
+        }
     }
 }

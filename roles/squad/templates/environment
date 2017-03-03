@@ -2,3 +2,4 @@ XDG_DATA_HOME={{install_base}}/data
 DATABASE=ENGINE=django.db.backends.postgresql_psycopg2:NAME=squad
 SQUAD_EXTRA_SETTINGS={{install_base}}/linaro_ldap.py
 SQUAD_SITE_NAME="Linaro QA"
+SQUAD_LOG_LEVEL=DEBUG
