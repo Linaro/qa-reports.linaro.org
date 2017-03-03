@@ -6,7 +6,7 @@ User=kernelci-monitor
 Group=kernelci-monitor
 PrivateTmp=yes
 WorkingDirectory={{kernelci_monitor_install_base}}/code
-ExecStart={{kernelci_monitor_install_base}}/bin/python manage.py celery worker -n kernelci-monitor@%h -B
+ExecStart={{kernelci_monitor_install_base}}/bin/python manage.py celery worker -n kernelci-monitor@%h -B --loglevel=DEBUG
 EnvironmentFile={{kernelci_monitor_install_base}}/environment
 Restart=on-failure
 RestartSec=5
