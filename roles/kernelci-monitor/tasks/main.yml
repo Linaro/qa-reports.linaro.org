@@ -12,6 +12,7 @@
     repo: https://github.com/Linaro/kernelci-monitor.git
     dest: "{{kernelci_monitor_install_base}}/code"
     version: "{{tags.json[0].name}}"
+  register: code
 
 - name: install requirements
   command: "{{kernelci_monitor_install_base}}/bin/pip install -r requirements.txt"
@@ -53,6 +54,7 @@
     mode: 0775
 
 - name: secrets
+  register: secrets
   copy:
     src: secrets/kernelci_monitor_secrets.py
     dest: '{{kernelci_monitor_install_base}}/code/kernelci_monitor_secrets.py'
@@ -61,11 +63,13 @@
     mode: 0640
 
 - name: secret key
+  register: secret_key
   shell: 'openssl rand -hex 64 > {{kernelci_monitor_install_base}}/data/secret.txt'
   args:
     creates: '{{kernelci_monitor_install_base}}/data/secret.txt'
 
 - name: Linaro LDAP settings file
+  register: ldap_settings
   copy:
     src: secrets/linaro_ldap.py
     dest: "{{kernelci_monitor_install_base}}/code/linaro_ldap.py"
@@ -74,6 +78,7 @@
     mode: 0640
 
 - name: local Django settings
+  register: django_settings
   template:
     src: roles/kernelci-monitor/templates/localsettings.py
     dest: '{{kernelci_monitor_install_base}}/code/localsettings.py'
@@ -126,12 +131,16 @@
   changed_when: False
 
 - command: systemctl restart kernelci-monitor-web.service
+  name: restart kernelci-monitor web UI
+  when: code.changed or secrets.changed or secret_key.changed or ldap_settings.changed or django_settings.changed
   changed_when: False
 
 - command: systemctl enable kernelci-monitor-worker.service
   changed_when: False
 
 - command: systemctl restart kernelci-monitor-worker.service
+  name: restart kernelci-monitor worker
+  when: code.changed or secrets.changed or secret_key.changed or ldap_settings.changed or django_settings.changed
   changed_when: False
 
 - file:

@@ -12,6 +12,7 @@
     repo: https://github.com/Linaro/squad-lava-listener.git
     dest: "{{lava_listener_install_base}}/code"
     version: "{{tags.json[0].name}}"
+  register: code
 
 - name: install requirements
   command: "{{lava_listener_install_base}}/bin/pip install -r requirements.txt"
@@ -34,6 +35,7 @@
 - template:
     src: roles/squad-lava-listener/templates/environment
     dest: "{{lava_listener_install_base}}/environment"
+  register: environmentfile
 
 - name: .bashrc
   template:
@@ -53,6 +55,7 @@
     mode: 0775
 
 - name: secrets
+  register: secrets
   copy:
     src: secrets/squad_lava_secrets.py
     dest: '{{lava_listener_install_base}}/code/squad_lava_secrets.py'
@@ -61,11 +64,13 @@
     mode: 0640
 
 - name: secret key
+  register: secret_key
   shell: 'openssl rand -hex 64 > {{lava_listener_install_base}}/data/secret.txt'
   args:
     creates: '{{lava_listener_install_base}}/data/secret.txt'
 
 - name: Linaro LDAP settings file
+  register: ldap_settings
   copy:
     src: secrets/linaro_ldap.py
     dest: "{{lava_listener_install_base}}/code/linaro_ldap.py"
@@ -74,6 +79,7 @@
     mode: 0640
 
 - name: local Django settings
+  register: django_settings
   template:
     src: roles/squad-lava-listener/templates/localsettings.py
     dest: '{{lava_listener_install_base}}/code/localsettings.py'
@@ -132,18 +138,24 @@
   changed_when: False
 
 - command: systemctl restart squad-lava-listener-web.service
+  name: restart squad-lava-listener web UI
+  when: code.changed or environmentfile.changed or secrets.changed or secret_key.changed or ldap_settings.changed or django_settings.changed
   changed_when: False
 
 - command: systemctl enable squad-lava-listener-worker.service
   changed_when: False
 
 - command: systemctl restart squad-lava-listener-worker.service
+  name: restart squad-lava-listener web worker
+  when: code.changed or environmentfile.changed or secrets.changed or secret_key.changed or ldap_settings.changed or django_settings.changed
   changed_when: False
 
 - command: systemctl enable squad-lava-listener-listener.service
   changed_when: False
 
 - command: systemctl restart squad-lava-listener-listener.service
+  name: restart squad-lava-listener listener
+  when: code.changed or environmentfile.changed or secrets.changed or secret_key.changed or ldap_settings.changed or django_settings.changed
   changed_when: False
 
 - file:

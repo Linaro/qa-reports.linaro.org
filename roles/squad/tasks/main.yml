@@ -21,6 +21,7 @@
     shell: /bin/bash
 
 - name: Linaro LDAP settings file
+  register: settings
   copy:
     src: secrets/linaro_ldap.py
     dest: "{{install_base}}/linaro_ldap.py"
@@ -29,6 +30,7 @@
     mode: 0640
 
 - name: environment file
+  register: environmentfile
   template:
     src: roles/squad/templates/environment
     dest: '{{install_base}}/environment'
@@ -72,6 +74,8 @@
   changed_when: False
 
 - command: systemctl restart squad.service
+  name: restart squad
+  when: install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
 
 - file:
