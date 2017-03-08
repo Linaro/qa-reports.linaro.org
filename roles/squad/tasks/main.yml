@@ -6,7 +6,7 @@
 - name: Install squad
   command: "{{install_base}}/bin/pip install -U squad{{squad_version}} psycopg2"
   register: install_squad
-  changed_when: "('up-to-date: squad' not in install_squad.stdout) and
+  changed_when: "('up-to-date: squad' not in install_squad.stdout) or
                 ('up-to-date: psycopg2' not in install_squad.stdout)"
 
 - name: install Django ldap auth module
