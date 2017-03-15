@@ -8,6 +8,7 @@
     - python-psycopg2
     - python-httplib2
     - postgresql
+    - postgresql-9.5-debversion # FIXME hardcoded version; change for new ubuntu versions
     - libpq-dev
     - libldap2-dev
     - libsasl2-dev

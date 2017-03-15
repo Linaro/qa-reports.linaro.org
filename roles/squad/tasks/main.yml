@@ -62,6 +62,12 @@
     owner: squad
   become_user: postgres
 
+- name: install debversion PostgreSQL extension
+  become_user: postgres
+  shell: 'psql -d squad -c "CREATE EXTENSION IF NOT EXISTS debversion;" || true'
+  register: debversion
+  changed_when: '"already exists" not in debversion.stderr'
+
 - name: systemd service
   template:
     src: roles/squad/templates/squad.service
