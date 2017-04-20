@@ -1,0 +1,16 @@
+[Unit]
+Description=SQUAD: software quality dashboard (scheduler)
+After=postgresql.service
+
+[Service]
+User=squad
+Group=squad
+PrivateTmp=yes
+WorkingDirectory={{install_base}}
+ExecStart={{install_base}}/bin/squad-admin celery beat --pidfile=''
+EnvironmentFile={{install_base}}/environment
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
