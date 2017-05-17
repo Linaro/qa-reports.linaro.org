@@ -4,4 +4,5 @@ SQUAD_EXTRA_SETTINGS={{install_base}}/linaro_ldap.py
 SQUAD_SITE_NAME="Linaro QA"
 SQUAD_LOG_LEVEL=DEBUG
 SQUAD_EMAIL_FROM=qa-reports@linaro.org
+SQUAD_LOGIN_FORM=Linaro user: use just your login (first.last). i.e. no @linaro.org
 ENV=production
