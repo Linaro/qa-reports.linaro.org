@@ -73,24 +73,28 @@
     src: roles/squad/templates/squad.service
     dest: /etc/systemd/system/squad.service
   notify: reload-systemd
+  register: squad_service
 
 - name: systemd service - worker
   template:
     src: roles/squad/templates/squad-worker.service
     dest: /etc/systemd/system/squad-worker.service
   notify: reload-systemd
+  register: squad_worker_service
 
 - name: systemd service - scheduler
   template:
     src: roles/squad/templates/squad-scheduler.service
     dest: /etc/systemd/system/squad-scheduler.service
   notify: reload-systemd
+  register: squad_scheduler_service
 
 - name: systemd service - listener
   template:
     src: roles/squad/templates/squad-listener.service
     dest: /etc/systemd/system/squad-listener.service
   notify: reload-systemd
+  register: squad_listener_service
 
 - meta: flush_handlers
 
@@ -108,22 +112,22 @@
 
 - command: systemctl restart squad.service
   name: restart squad
-  when: install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_service.changed or install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
 
 - command: systemctl restart squad-worker.service
   name: restart squad-worker
-  when: install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
 
 - command: systemctl restart squad-scheduler.service
   name: restart squad-scheduler
-  when: install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_scheduler_service.changed or  install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
 
 - command: systemctl restart squad-listener.service
   name: restart squad-listener
-  when: install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
 
 - file:
