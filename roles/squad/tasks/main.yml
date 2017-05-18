@@ -86,6 +86,12 @@
     dest: /etc/systemd/system/squad-scheduler.service
   notify: reload-systemd
 
+- name: systemd service - listener
+  template:
+    src: roles/squad/templates/squad-listener.service
+    dest: /etc/systemd/system/squad-listener.service
+  notify: reload-systemd
+
 - meta: flush_handlers
 
 - command: systemctl enable squad.service
@@ -95,6 +101,9 @@
   changed_when: False
 
 - command: systemctl enable squad-scheduler.service
+  changed_when: False
+
+- command: systemctl enable squad-listener.service
   changed_when: False
 
 - command: systemctl restart squad.service
@@ -109,6 +118,11 @@
 
 - command: systemctl restart squad-scheduler.service
   name: restart squad-scheduler
+  when: install_squad.changed or settings.changed or environmentfile.changed
+  changed_when: False
+
+- command: systemctl restart squad-listener.service
+  name: restart squad-listener
   when: install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
 
