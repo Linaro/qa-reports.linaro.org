@@ -1,5 +1,8 @@
 [production]
 qa-reports.linaro.org
 
+[staging]
+staging-qa-reports.linaro.org
+
 [dev]
 qa-reports.local
