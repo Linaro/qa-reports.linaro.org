@@ -110,6 +110,11 @@
 - command: systemctl enable squad-listener.service
   changed_when: False
 
+- command: '{{install_base}}/bin/squad-admin migrate'
+  name: migrate
+  when: install_squad.changed
+  user: squad
+
 - command: systemctl restart squad.service
   name: restart squad
   when: squad_service.changed or install_squad.changed or settings.changed or environmentfile.changed
