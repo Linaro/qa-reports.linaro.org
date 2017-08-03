@@ -111,8 +111,9 @@
   changed_when: False
 
 - command: '{{install_base}}/bin/squad-admin migrate'
-  name: migrate
+  register: migrate
   when: install_squad.changed
+  changed_when: False
   user: squad
 
 - command: systemctl restart squad.service
