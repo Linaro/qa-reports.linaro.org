@@ -110,11 +110,11 @@
 - command: systemctl enable squad-listener.service
   changed_when: False
 
-- command: '{{install_base}}/bin/squad-admin migrate'
-  register: migrate
+- command: env -i bash -l -c '{{install_base}}/bin/squad-admin migrate'
+  name: migrate database
   when: install_squad.changed
   changed_when: False
-  user: squad
+  become_user: squad
 
 - command: systemctl restart squad.service
   name: restart squad
