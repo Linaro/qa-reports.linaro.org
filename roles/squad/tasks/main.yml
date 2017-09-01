@@ -148,14 +148,14 @@
     src: roles/squad/templates/apache2.conf
     dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
   notify: reload-apache2
-  when: "'{{inventory_hostname}}' not in ssl.stdout"
+  when: "inventory_hostname not in ssl.stdout"
 
 - name: apache2 config (SSL)
   template:
     src: roles/squad/templates/apache2-ssl.conf
     dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
   notify: reload-apache2
-  when: "'{{inventory_hostname}}' in ssl.stdout"
+  when: "inventory_hostname in ssl.stdout"
 
 - command: a2ensite {{inventory_hostname}}
   register: result
