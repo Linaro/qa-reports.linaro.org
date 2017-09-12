@@ -8,4 +8,8 @@ if [ ! -f $passwd_file ]; then
   openssl rand -hex 32 | gpg --encrypt --output $passwd_file
 fi
 
-gpg --quiet --batch --use-agent --decrypt $passwd_file
+for file in $passwd_file $basedir/secrets/vault-*.gpg; do
+  if gpg --quiet --batch --use-agent --decrypt $file 2>/dev/null; then
+    exit
+  fi
+done
