@@ -7,3 +7,4 @@ SQUAD_EMAIL_FROM=qa-reports@linaro.org
 SQUAD_LOGIN_MESSAGE="Linaro user: use just your login (first.last). i.e. no @linaro.org"
 SQUAD_ADMINS='Antonio Terceiro <antonio.terceiro@linaro.org>, Milosz Wasilewski <milosz.wasilewski@linaro.org>'
 ENV=production
+GUNICORN_CMD_ARGS="--workers 2"
