@@ -1,0 +1,15 @@
+[Unit]
+Description=SQUAD staging upgrade service
+After=squad.service
+
+[Service]
+User=root
+Group=root
+PrivateTmp=yes
+ExecStart=/usr/local/sbin/squad-staging --listen
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+

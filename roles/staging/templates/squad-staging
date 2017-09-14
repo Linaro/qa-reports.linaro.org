@@ -1,0 +1,52 @@
+#!/bin/sh
+
+set -eu
+
+if [ "${1:-}" = '--listen' ]; then
+    amqp-declare-queue --durable -q squad-staging >/dev/null
+    exec amqp-consume -q squad-staging --prefetch-count 1 -- $0
+fi
+
+upgrade() {
+    remote=https://github.com/Linaro/squad.git
+    local=/var/lib/squad.git
+
+    run() {
+        runuser -u nobody -g nogroup -- "$@"
+    }
+
+    if [ -d "$local" ]; then
+        (cd "$local" && run git pull --quiet || true)
+    else
+        mkdir -p "$local"
+        chown -R nobody:nogroup "$local"
+        run git clone "$remote" "$local"
+    fi
+
+    . {{install_base}}/bin/activate
+
+    if run "$local"/scripts/git-build; then
+        pip install "$local"/dist/squad*.whl
+        ls -1 /etc/systemd/system/squad*.service \
+            | xargs -n 1 basename \
+            | xargs systemctl restart
+    fi
+
+    sleep 5 # wait a few seconds
+    pgrep -fa  'squad$'
+    pgrep -fa  'squad-admin listen'
+    pgrep -fa  'squad-admin celery beat'
+    pgrep -fa  'squad-admin celery worker'
+}
+
+echo "Upgrading ..."
+log=$(mktemp)
+trap 'rm -rf $log' INT TERM EXIT
+rc=0
+upgrade > "$log" 2>&1 || rc=$?
+if [ "$rc" -ne 0 ]; then
+  . {{install_base}}/environment
+  mail --append "From: $SQUAD_EMAIL_FROM" -t "$SQUAD_ADMINS" -s "{{inventory_hostname}}: FAILED UPGRADE" < "$log"
+  cat "$log"
+fi
+echo "Finished"

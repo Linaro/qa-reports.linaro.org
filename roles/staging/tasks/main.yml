@@ -1,0 +1,38 @@
+- apt:
+    pkg: '{{item}}'
+    state: installed
+  with_items:
+    - amqp-tools
+    - moreutils
+    - unzip
+
+- name: update script
+  template:
+    src: roles/staging/templates/squad-staging
+    dest: /usr/local/sbin/squad-staging
+    owner: root
+    mode: 0755
+
+- name: service
+  copy:
+    src: roles/staging/files/squad-staging.service
+    dest: /etc/systemd/system/squad-staging.service
+  notify: reload-systemd
+  register: squad_staging_service
+
+- meta: flush_handlers
+
+- command: systemctl enable squad.service
+  changed_when: False
+
+- command: systemctl restart squad-staging.service
+  name: restart squad-staging
+  when: squad_staging_service.changed
+  changed_when: False
+
+- name: webhook CGI
+  copy:
+    src: roles/staging/files/squad-upgrade-webhook
+    dest: /usr/lib/cgi-bin/squad-upgrade-webhook
+    owner: root
+    mode: 0755
