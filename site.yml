@@ -9,3 +9,5 @@
       command: systemctl daemon-reload
     - name: reload-apache2
       command: systemctl reload apache2
+    - name: restart-apache2
+      command: systemctl reload apache2
