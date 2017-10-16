@@ -7,6 +7,7 @@ User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
+After=postgresql.service rabbitmq-server.service
 ExecStart={{install_base}}/bin/squad-admin celery worker --loglevel INFO
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
