@@ -53,20 +53,15 @@
     mode: 0755
     state: directory
 
-- postgresql_user:
-    name: squad
-  become_user: postgres
+- name: create database user
+  shell: sudo -u postgres createuser squad || true
+  register: createuser
+  changed_when: '"already exists" not in createuser.stderr'
 
-- postgresql_db:
-    name: squad
-    owner: squad
-  become_user: postgres
-
-- name: drop debversion PostgreSQL extension
-  become_user: postgres
-  shell: 'psql -d squad -c "DROP EXTENSION IF EXISTS debversion;" || true'
-  register: debversion
-  changed_when: '"does not exist" not in debversion.stderr'
+- name: create database
+  shell: sudo -u postgres createdb --owner=squad squad || true
+  register: createdb
+  changed_when: '"already exists" not in createdb.stderr'
 
 - name: systemd service - web
   template:
@@ -110,11 +105,10 @@
 - command: systemctl enable squad-listener.service
   changed_when: False
 
-- command: env -i bash -l -c '{{install_base}}/bin/squad-admin migrate'
+- command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin migrate'
   name: migrate database
   when: install_squad.changed
   changed_when: False
-  become_user: squad
 
 - command: systemctl restart squad.service
   name: restart squad
