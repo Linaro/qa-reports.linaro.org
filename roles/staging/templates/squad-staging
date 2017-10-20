@@ -29,6 +29,7 @@ upgrade() {
         pip install "$local"/dist/squad*.whl
         ls -1 /etc/systemd/system/squad*.service \
             | xargs -n 1 basename \
+            | grep -v squad-staging \
             | xargs systemctl restart
     fi
 
