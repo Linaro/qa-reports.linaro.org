@@ -22,7 +22,7 @@
 
 - meta: flush_handlers
 
-- command: systemctl enable squad.service
+- command: systemctl enable squad-staging.service
   changed_when: False
 
 - command: systemctl restart squad-staging.service
