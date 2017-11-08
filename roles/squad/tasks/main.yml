@@ -110,8 +110,8 @@
   when: install_squad.changed
   changed_when: False
 
-- command: systemctl restart squad.service
-  name: restart squad
+- command: systemctl reload squad.service
+  name: reload squad
   when: squad_service.changed or install_squad.changed or settings.changed or environmentfile.changed
   changed_when: False
   notify: reload-apache2

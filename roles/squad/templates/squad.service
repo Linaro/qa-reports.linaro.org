@@ -9,6 +9,7 @@ PrivateTmp=yes
 WorkingDirectory={{install_base}}
 After=postgresql.service rabbitmq-server.service
 ExecStart={{install_base}}/bin/squad
+ExecReload=/bin/kill -HUP $MAINPID
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
 RestartSec=5
