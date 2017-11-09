@@ -1,13 +1,12 @@
 [Unit]
 Description=SQUAD: software quality dashboard (worker)
-After=postgresql.service
+After=postgresql.service rabbitmq-server.service
 
 [Service]
 User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
-After=postgresql.service rabbitmq-server.service
 ExecStart={{install_base}}/bin/squad-admin celery worker --concurrency 1 --loglevel INFO
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
