@@ -12,6 +12,7 @@
     - libpq-dev
     - libldap2-dev
     - libsasl2-dev
+    - libyaml-dev
     - apache2
     - libapache2-mod-wsgi
     - rabbitmq-server
