@@ -9,6 +9,16 @@
   changed_when: "('up-to-date: squad' not in install_squad.stdout) or
                 ('up-to-date: psycopg2' not in install_squad.stdout)"
 
+- name: get python path
+  shell: "{{install_base}}/bin/python3 -c 'import sys; print(sys.path[-1])'"
+  register: python_path
+
+- name: install linaro_ldap_backends
+  register: linaro_ldap_backends
+  template:
+    src: roles/squad/templates/linaro_ldap_backends.py
+    dest: '{{python_path.stdout}}/linaro_ldap_backends.py'
+
 - name: install Django ldap auth module
   command: "{{install_base}}/bin/pip install -U django-auth-ldap"
   register: install_django_ldap
@@ -112,23 +122,23 @@
 
 - command: systemctl reload squad.service
   name: reload squad
-  when: squad_service.changed or install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
   changed_when: False
   notify: reload-apache2
 
 - command: systemctl restart squad-worker.service
   name: restart squad-worker
-  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
   changed_when: False
 
 - command: systemctl restart squad-scheduler.service
   name: restart squad-scheduler
-  when: squad_scheduler_service.changed or  install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_scheduler_service.changed or  install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
   changed_when: False
 
 - command: systemctl restart squad-listener.service
   name: restart squad-listener
-  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed
+  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
   changed_when: False
 
 - file:
