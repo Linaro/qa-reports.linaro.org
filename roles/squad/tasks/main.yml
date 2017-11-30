@@ -12,6 +12,7 @@
 - name: get python path
   shell: "{{install_base}}/bin/python3 -c 'import sys; print(sys.path[-1])'"
   register: python_path
+  changed_when: False
 
 - name: install linaro_ldap_backends
   register: linaro_ldap_backends
