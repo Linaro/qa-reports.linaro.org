@@ -18,7 +18,7 @@
     - rabbitmq-server
     - git
 
-- command: a2enmod proxy proxy_balancer lbmethod_byrequests proxy_http rewrite ssl cgid
+- command: a2enmod proxy proxy_balancer lbmethod_byrequests proxy_http rewrite ssl cgid headers
   register: result
   changed_when: "'Enabling module' in result.stdout"
   notify: restart-apache2
