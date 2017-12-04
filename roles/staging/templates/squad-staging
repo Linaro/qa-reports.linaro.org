@@ -36,8 +36,8 @@ upgrade() {
     sleep 5 # wait a few seconds
     pgrep -fa  'squad$'
     pgrep -fa  'squad-admin listen'
-    pgrep -fa  'squad-admin celery beat'
-    pgrep -fa  'squad-admin celery worker'
+    pgrep -fa  'celery.*squad.*beat'
+    pgrep -fa  'celery.*squad.*worker'
 }
 
 echo "Upgrading ..."
