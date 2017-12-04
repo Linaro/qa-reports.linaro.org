@@ -7,7 +7,7 @@ User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
-ExecStart={{install_base}}/bin/celery -A squad beat --pidfile=''
+ExecStart={{install_base}}/bin/celery -A squad beat --pidfile='' --schedule={{install_base}}/data/celerybeat-schedule.db
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
 RestartSec=5
