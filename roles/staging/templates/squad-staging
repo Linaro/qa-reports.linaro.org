@@ -46,8 +46,8 @@ trap 'rm -rf $log' INT TERM EXIT
 rc=0
 upgrade > "$log" 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
-  . {{install_base}}/environment
-  mail --append "From: $SQUAD_EMAIL_FROM" -t "$SQUAD_ADMINS" -s "{{inventory_hostname}}: FAILED UPGRADE" < "$log"
-  cat "$log"
+    . {{install_base}}/environment
+    mail --append "From: $SQUAD_EMAIL_FROM" -t "$SQUAD_ADMINS" -s "{{inventory_hostname}}: FAILED UPGRADE" < "$log"
+    cat "$log"
 fi
 echo "Finished"
