@@ -34,7 +34,7 @@ upgrade() {
     fi
 
     sleep 5 # wait a few seconds
-    pgrep -fa  'squad$'
+    pgrep -fa  'gunicorn.*squad.wsgi'
     pgrep -fa  'squad-admin listen'
     pgrep -fa  'celery.*squad.*beat'
     pgrep -fa  'celery.*squad.*worker'
