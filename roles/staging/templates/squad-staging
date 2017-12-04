@@ -20,7 +20,7 @@ upgrade() {
     else
         mkdir -p "$local"
         chown -R nobody:nogroup "$local"
-        run git clone "$remote" "$local"
+        (cd "$local" && run git clone "$remote" .)
     fi
 
     . {{install_base}}/bin/activate
