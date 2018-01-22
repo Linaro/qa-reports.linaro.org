@@ -1,1 +1,2 @@
 site_name: "Linaro QA STAGING"
+linaro_ldap: true

@@ -21,11 +21,21 @@ else
     extra_arg='--ask-become-pass'
 fi
 
+use_vault=
+if [ -f hosts.local ]; then
+    # not Linaro
+    inventory="${basedir}/hosts.local"
+else
+    inventory="${basedir}/hosts"
+    if [ "$env" = "production" -o "$env" = "staging" ]; then
+        use_vault="--vault-password-file=$basedir/vault-passwd"
+    fi
+fi
 
 export ANSIBLE_CONFIG="${basedir}/ansible.cfg"
 exec ansible-playbook \
-    --vault-password-file=$basedir/vault-passwd \
-    --inventory-file=$basedir/hosts \
+    $use_vault \
+    --inventory-file="$inventory" \
     --verbose \
     --become \
     -l "$env" \
