@@ -4,13 +4,13 @@ first deploy SSL (only needed in the very first time, or if the SSL setup
 changed):
 
 ```
-./go production ssl.yml
+./deploy production ssl.yml
 ```
 
 Then do the rest of the deployment:
 
 ```
-./go production
+./deploy production
 ```
 
 # deploy to development environment
@@ -24,5 +24,5 @@ vagrant up
 then deploy
 
 ```
-./go dev
+./deploy dev
 ```
