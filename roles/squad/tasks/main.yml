@@ -21,6 +21,11 @@
     src: roles/squad/templates/linaro_ldap_backends.py
     dest: '{{python_path.stdout}}/linaro_ldap_backends.py'
 
+- name: install Linaro-specific SQUAD plugins
+  command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed squad-linaro-plugins"
+  register: install_squad_linaro_plugins
+  changed_when: "'up-to-date: squad-linaro-plugins' not in install_squad_linaro_plugins.stdout"
+
 - name: install Django ldap auth module
   command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed django-auth-ldap"
   register: install_django_ldap
@@ -130,23 +135,29 @@
 
 - shell: 'if systemctl is-active squad.service; then systemctl reload squad.service; else systemctl restart squad.service; fi'
   name: start/reload squad
-  when: squad_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
+  when: squad_service.changed or install_squad.changed or settings.changed or linaro_ldap_backends.changed
+  changed_when: False
+  notify: reload-apache2
+
+- shell: systemctl restart squad.service
+  name: restart squad
+  when: environmentfile.changed  or install_squad_linaro_plugins.changed
   changed_when: False
   notify: reload-apache2
 
 - command: systemctl restart squad-worker.service
   name: restart squad-worker
-  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
+  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
   changed_when: False
 
 - command: systemctl restart squad-scheduler.service
   name: restart squad-scheduler
-  when: squad_scheduler_service.changed or  install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
+  when: squad_scheduler_service.changed or  install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
   changed_when: False
 
 - command: systemctl restart squad-listener.service
   name: restart squad-listener
-  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed
+  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
   changed_when: False
 
 - file:
