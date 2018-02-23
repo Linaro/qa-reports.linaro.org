@@ -1,12 +1,12 @@
 # Store state file in S3
 # This has to be hard coded because it is loaded before anything else.
-terraform {
-  backend "s3" {
-    bucket = "linaro-terraform-state"
-    key = "qa-reports/staging/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
+#terraform {
+#  backend "s3" {
+#    bucket = "linaro-terraform-state"
+#    key = "qa-reports/staging/terraform.tfstate"
+#    region = "us-east-1"
+#  }
+#}
 
 variable "route53_base_domain_name" { type = "string" }
 variable "canonical_dns_name" { type = "string" }

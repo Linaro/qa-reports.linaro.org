@@ -32,24 +32,17 @@ encrypted group_vars files in ../ansible/group_vars:
 
 Plan the deployment:
 
-    make plan
+    make plan # staging is default
+    make plan ENV=production # production plan
 
 Do the deployment:
 
-    make apply
+    make apply # staging
+    make apply ENV=production # production
 
 Update ansible's inventory:
 
     make inventory
-
-# TODO
-
-prod environment is blocked due to state file handling. As written, prod would
-use the same state file as staging. Everything would work, but this is
-undesirable due to the risk of shared state between environments. The blocker
-is the fact that the 'backend' configuration in qa-reports.tf is hard coded
-(because terraform can't use variables there). Workarounds.. perhaps using the
-'override' mechanism.
 
 # Caveats
 

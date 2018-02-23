@@ -1,21 +1,22 @@
 ENV := staging
 
-all: plan apply
+override:
+	./scripts/set_env.sh ${ENV}
 
 .terraform:
 	terraform init
 
-plan: .terraform
+plan: .terraform override
 	terraform plan -var-file=shared.tfvars -var-file=${ENV}.tfvars .
 
-repl: .terraform
+repl: .terraform override
 	terraform console -var-file=shared.tfvars -var-file=${ENV}.tfvars .
 
-apply: .terraform
+apply: .terraform override
 	terraform apply -var-file=shared.tfvars -var-file=${ENV}.tfvars .
 
-inventory:
+inventory: override
 	terraform state pull | ./scripts/state_to_ansible_inventory.py > ../ansible/hosts.staging
 
 clean:
-	rm -rf .terraform errored.tfstate
+	rm -rf .terraform errored.tfstate qa-reports_override.tf
