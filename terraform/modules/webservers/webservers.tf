@@ -1,26 +1,15 @@
 # Required variables
-variable "environment" {
-  type = "string"
-}
-variable "vpc_id" {
-  type = "string"
-}
+variable "environment" { type = "string" }
+variable "vpc_id" { type = "string" }
 variable "availability_zone_to_subnet_map" {
   type = "map"
   description = "Map of availability zones to subnet IDs"
 }
-variable "ssh_key_path" {
-  type = "string"
-}
-variable "ami_id" {
-  type = "string"
-}
-variable "route53_zone_id" {
-  type = "string"
-}
-variable "route53_base_domain_name" {
-  type = "string"
-}
+variable "ssh_key_path" { type = "string" }
+variable "ami_id" { type = "string" }
+variable "route53_zone_id" { type = "string" }
+variable "route53_base_domain_name" { type = "string" }
+variable "canonical_dns_name" { type = "string" }
 
 # Optional variables
 variable "www_instance_type" {
@@ -43,8 +32,15 @@ variable "worker_instance_count" {
 # Calculated variables
 locals {
   subnets = "${values(var.availability_zone_to_subnet_map)}"
+  local_dns_name = "${var.environment}-qa-reports.${var.route53_base_domain_name}"
 }
 
+# ACM cert
+resource "aws_acm_certificate" "acm-cert" {
+  domain_name = "${var.canonical_dns_name}"
+  subject_alternative_names = ["${local.local_dns_name}"]
+  validation_method = "EMAIL"
+}
 
 # A security group for the load balancer so it is accessible via the web
 resource "aws_security_group" "qa-reports-lb-sg" {
@@ -131,7 +127,7 @@ resource "aws_lb_listener" "qa-reports-lb-listener-80" {
 }
 resource "aws_route53_record" "qa-reports-lb-dns" {
   zone_id = "${var.route53_zone_id}"
-  name = "${var.environment}-qa-reports.${var.route53_base_domain_name}"
+  name = "${local.local_dns_name}"
   type = "A"
   alias {
     name = "${aws_lb.qa-reports-lb.dns_name}"
@@ -164,14 +160,16 @@ resource "aws_instance" "qa-reports-www" {
   # len(availability_zones) it will wrap.
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
-  # We run a remote provisioner on the instance after creating it.
-  # In this case, we just install nginx and start it. By default,
-  # this should be on port 80
+  # Initial host provisioning.
+  provisioner "file" {
+    source      = "scripts/provision.sh"
+    destination = "provision.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get -y update",
-      "sudo apt-get -y install nginx",
-      "sudo service nginx start",
+      "chmod +x provision.sh",
+      "./provision.sh",
     ]
   }
 
@@ -221,14 +219,16 @@ resource "aws_instance" "qa-reports-worker" {
   # len(availability_zones) it will wrap.
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
-  # We run a remote provisioner on the instance after creating it.
-  # In this case, we just install nginx and start it. By default,
-  # this should be on port 80
+  # Initial host provisioning.
+  provisioner "file" {
+    source      = "scripts/provision.sh"
+    destination = "provision.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get -y update",
-      "sudo apt-get -y install nginx",
-      "sudo service nginx start",
+      "chmod +x provision.sh",
+      "./provision.sh",
     ]
   }
 

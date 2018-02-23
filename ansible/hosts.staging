@@ -1,9 +1,9 @@
 [staging]
 [staging:webserver]
-staging-qa-reports-www-0 ansible_host=34.201.72.240
-staging-qa-reports-www-1 ansible_host=34.203.12.2
+staging-qa-reports-www-0 ansible_host=54.237.226.179
+staging-qa-reports-www-1 ansible_host=107.23.162.141
 [staging:worker]
-staging-qa-reports-worker-0 ansible_host=35.170.185.50
-staging-qa-reports-worker-1 ansible_host=54.210.157.86
+staging-qa-reports-worker-0 ansible_host=54.146.216.187
+staging-qa-reports-worker-1 ansible_host=34.234.83.170
 [staging:database]
 terraform-20180223202455880900000001.cuuutnsao02n.us-east-1.rds.amazonaws.com

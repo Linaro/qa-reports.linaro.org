@@ -9,9 +9,13 @@ terraform {
 }
 
 variable "route53_base_domain_name" { type = "string" }
+variable "canonical_dns_name" { type = "string" }
 variable "environment" { type = "string" }
 variable "availability_zone_to_subnet_map" { type = "map" }
-variable "ssh_key_path" { type = "string" }
+variable "ssh_key_path" {
+  type = "string"
+  default="scripts/qa-reports.pub"
+}
 variable "ami_id" { type = "string" }
 variable "route53_zone_id" { type = "string" }
 variable "vpc_id" { type = "string" }
@@ -47,6 +51,7 @@ module "webservers" {
   ami_id = "${var.ami_id}"
   route53_zone_id = "${var.route53_zone_id}"
   route53_base_domain_name = "${var.route53_base_domain_name}"
+  canonical_dns_name = "${var.canonical_dns_name}"
 }
 
 module "rds" {

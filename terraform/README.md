@@ -1,6 +1,11 @@
 # Terraform
 
-- state is stored in s3
+This terraform repository stands up qa-reports.linaro.org's AWS infrastructure including:
+- webservers (2)
+- workers (2)
+- RDS database
+- load balancer
+- staging and production environments
 
 # Usage
 
@@ -39,12 +44,12 @@ Update ansible's inventory:
 
 # TODO
 
-- ACM cert
-
-- ssh keys in repo for initial bootstrap
-
-- set up prod
-- commit ansible inventory
+prod environment is blocked due to state file handling. As written, prod would
+use the same state file as staging. Everything would work, but this is
+undesirable due to the risk of shared state between environments. The blocker
+is the fact that the 'backend' configuration in qa-reports.tf is hard coded
+(because terraform can't use variables there). Workarounds.. perhaps using the
+'override' mechanism.
 
 # Caveats
 
