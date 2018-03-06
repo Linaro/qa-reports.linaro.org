@@ -1,0 +1,29 @@
+- name: systemd service - listener
+  template:
+    src: roles/master/templates/squad-listener.service
+    dest: /etc/systemd/system/squad-listener.service
+  notify: reload-systemd
+  register: squad_listener_service
+
+- command: systemctl enable squad-listener.service
+  changed_when: False
+
+- command: systemctl restart squad-listener.service
+  name: restart squad-listener
+  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
+  changed_when: False
+
+- name: systemd service - scheduler
+  template:
+    src: roles/master/templates/squad-scheduler.service
+    dest: /etc/systemd/system/squad-scheduler.service
+  notify: reload-systemd
+  register: squad_scheduler_service
+
+- command: systemctl enable squad-scheduler.service
+  changed_when: False
+
+- command: systemctl restart squad-scheduler.service
+  name: restart squad-scheduler
+  when: squad_scheduler_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
+  changed_when: False

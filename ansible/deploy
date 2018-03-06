@@ -17,27 +17,19 @@ basedir=$(dirname $0)
 extra_arg=''
 if [ "$env" = 'dev' ] && [ -d .vagrant ]; then
     vagrant ssh-config | sed -e 's/^Host.*/Host qa-reports.local/'> .vagrant/ssh_config
-else
-    extra_arg='--ask-become-pass'
 fi
 
+inventory="${basedir}/hosts.${env}"
+
 use_vault=
-if [ -f hosts.local ]; then
-    # not Linaro
-    inventory="${basedir}/hosts.local"
-else
-    inventory="${basedir}/hosts"
-    if [ "$env" = "production" -o "$env" = "staging" ]; then
-        use_vault="--vault-password-file=$basedir/vault-passwd"
-    fi
+if [ "$env" = "production" -o "$env" = "staging" ]; then
+    use_vault="--vault-password-file=$basedir/vault-passwd"
 fi
 
 export ANSIBLE_CONFIG="${basedir}/ansible.cfg"
 exec ansible-playbook \
     $use_vault \
     --inventory-file="$inventory" \
-    --verbose \
     --become \
-    -l "$env" \
     $extra_arg \
     "$@"

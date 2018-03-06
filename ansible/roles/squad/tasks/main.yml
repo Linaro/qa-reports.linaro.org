@@ -1,3 +1,18 @@
+- name: Install message broker packages
+  apt: pkg={{item}} state=installed update-cache=yes
+  when: master_node
+  with_items:
+    - rabbitmq-server
+
+- name: RabbitMQ config
+  when: master_node
+  template:
+    src: roles/squad/templates/rabbitmq.config
+    dest: /etc/rabbitmq/rabbitmq.config
+  notify: restart-rabbitmq
+
+- meta: flush_handlers
+
 - name: create virtualenv
   command: virtualenv --python=/usr/bin/python3 {{install_base}}
   args:
@@ -71,117 +86,7 @@
     mode: 0755
     state: directory
 
-- name: create database user
-  shell: sudo -u postgres createuser squad || true
-  register: createuser
-  changed_when: '"already exists" not in createuser.stderr'
-
-- name: create database
-  shell: sudo -u postgres createdb --owner=squad squad || true
-  register: createdb
-  changed_when: '"already exists" not in createdb.stderr'
-
-- name: systemd service - web
-  template:
-    src: roles/squad/templates/squad.service
-    dest: /etc/systemd/system/squad.service
-  notify: reload-systemd
-  register: squad_service
-
-- name: systemd service - worker
-  template:
-    src: roles/squad/templates/squad-worker.service
-    dest: /etc/systemd/system/squad-worker.service
-  notify: reload-systemd
-  register: squad_worker_service
-
-- name: systemd service - scheduler
-  template:
-    src: roles/squad/templates/squad-scheduler.service
-    dest: /etc/systemd/system/squad-scheduler.service
-  notify: reload-systemd
-  register: squad_scheduler_service
-
-- name: systemd service - listener
-  template:
-    src: roles/squad/templates/squad-listener.service
-    dest: /etc/systemd/system/squad-listener.service
-  notify: reload-systemd
-  register: squad_listener_service
-
-- meta: flush_handlers
-
-- command: systemctl enable squad.service
-  changed_when: False
-
-- command: systemctl enable squad-worker.service
-  changed_when: False
-
-- command: systemctl enable squad-scheduler.service
-  changed_when: False
-
-- command: systemctl enable squad-listener.service
-  changed_when: False
-
-- command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin collectstatic --no-input -v 0'
-  name: collect static files
-  when: install_squad.changed
-  changed_when: False
-
 - command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin migrate'
   name: migrate database
-  when: install_squad.changed
+  when: 'install_squad.changed and master_node'
   changed_when: False
-
-- shell: 'if systemctl is-active squad.service; then systemctl reload squad.service; else systemctl restart squad.service; fi'
-  name: start/reload squad
-  when: squad_service.changed or install_squad.changed or settings.changed or linaro_ldap_backends.changed
-  changed_when: False
-  notify: reload-apache2
-
-- shell: systemctl restart squad.service
-  name: restart squad
-  when: environmentfile.changed  or install_squad_linaro_plugins.changed
-  changed_when: False
-  notify: reload-apache2
-
-- command: systemctl restart squad-worker.service
-  name: restart squad-worker
-  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
-  changed_when: False
-
-- command: systemctl restart squad-scheduler.service
-  name: restart squad-scheduler
-  when: squad_scheduler_service.changed or  install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
-  changed_when: False
-
-- command: systemctl restart squad-listener.service
-  name: restart squad-listener
-  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
-  changed_when: False
-
-- file:
-    path: "{{install_base}}/www"
-    owner: root
-    group: root
-    mode: 0555
-    state: directory
-
-- name: apache2 config (no SSL)
-  template:
-    src: roles/squad/templates/apache2.conf
-    dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
-  notify: reload-apache2
-  when: "inventory_hostname not in ssl.stdout"
-
-- name: apache2 config (SSL)
-  template:
-    src: roles/squad/templates/apache2-ssl.conf
-    dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
-  notify: reload-apache2
-  when: "inventory_hostname in ssl.stdout"
-
-- command: a2ensite {{inventory_hostname}}
-  register: result
-  changed_when: "'Enabling site' in result.stdout"
-  notify: reload-apache2
