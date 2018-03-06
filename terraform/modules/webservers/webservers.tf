@@ -72,6 +72,11 @@ resource "aws_security_group" "qa-reports-lb-sg" {
   }
 }
 
+data "aws_subnet" "oursubnets" {
+  count = "${length(values(var.availability_zone_to_subnet_map))}"
+  id = "${element(values(var.availability_zone_to_subnet_map), count.index)}"
+}
+
 # Instance security group to access the instances over SSH and HTTP
 resource "aws_security_group" "qa-reports-ec2-www" {
   name        = "${var.environment}-qa-reports ec2 www"
@@ -86,12 +91,33 @@ resource "aws_security_group" "qa-reports-ec2-www" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # HTTP access from anywhere
+  # HTTP access from local network
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+
+  # RabbitMQ clustering traffic inside local network
+  # source: https://www.rabbitmq.com/networking.html
+  ingress {
+    from_port   = 4369
+    to_port     = 4369
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+  ingress {
+    from_port   = 5671
+    to_port     = 5672
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+  ingress {
+    from_port   = 25672
+    to_port     = 25672
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
   }
 
   # outbound internet access
