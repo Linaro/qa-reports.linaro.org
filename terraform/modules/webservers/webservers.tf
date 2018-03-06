@@ -197,18 +197,7 @@ resource "aws_instance" "qa-reports-www" {
   # len(availability_zones) it will wrap.
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
-  # Initial host provisioning.
-  provisioner "file" {
-    source      = "scripts/provision.sh"
-    destination = "provision.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x provision.sh",
-      "./provision.sh",
-    ]
-  }
+  user_data = "${file("scripts/provision.sh")}"
 
   tags {
     Name = "${var.environment}-qa-reports-www-${count.index}"
@@ -257,17 +246,7 @@ resource "aws_instance" "qa-reports-worker" {
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
   # Initial host provisioning.
-  provisioner "file" {
-    source      = "scripts/provision.sh"
-    destination = "provision.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x provision.sh",
-      "./provision.sh",
-    ]
-  }
+  user_data = "${file("scripts/provision.sh")}"
 
   tags {
     Name = "${var.environment}-qa-reports-worker-${count.index}"
