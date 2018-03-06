@@ -151,6 +151,17 @@ resource "aws_lb_listener" "qa-reports-lb-listener-80" {
     type             = "forward"
   }
 }
+resource "aws_lb_listener" "qa-reports-lb-listener-443" {
+  load_balancer_arn = "${aws_lb.qa-reports-lb.arn}"
+  port = 443
+  protocol = "HTTPS"
+  certificate_arn = "${aws_acm_certificate.acm-cert.arn}"
+  default_action {
+    target_group_arn = "${aws_lb_target_group.qa-reports-tg.arn}"
+    type             = "forward"
+  }
+}
+
 resource "aws_route53_record" "qa-reports-lb-dns" {
   zone_id = "${var.route53_zone_id}"
   name = "${local.local_dns_name}"
