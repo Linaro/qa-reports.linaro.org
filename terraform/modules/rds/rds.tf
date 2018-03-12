@@ -1,4 +1,5 @@
 variable "environment" { type = "string" }
+variable "db_host_size" { type = "string" }
 variable "rds_db_password" { type = "string" }
 variable "availability_zone_to_subnet_map" { type = "map" }
 variable "vpc_id" { type = "string" }
@@ -43,7 +44,7 @@ resource "aws_db_subnet_group" "default" {
 resource "aws_db_instance" "default" {
     allocated_storage = 20 # minimum
     engine = "postgres"
-    instance_class = "db.t2.micro"
+    instance_class = "db.${var.db_host_size}"
     name = "${var.environment}qareports"
     username = "qareports"
     password = "${var.rds_db_password}"

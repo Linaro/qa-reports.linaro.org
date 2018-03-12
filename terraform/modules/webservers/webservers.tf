@@ -14,7 +14,7 @@ variable "canonical_dns_name" { type = "string" }
 # Optional variables
 variable "www_instance_type" {
   type = "string"
-  default = "t2.micro"
+  default = "t2.small"
 }
 variable "www_instance_count" {
   type = "string"
@@ -22,7 +22,7 @@ variable "www_instance_count" {
 }
 variable "worker_instance_type" {
   type = "string"
-  default = "t2.micro"
+  default = "t2.small"
 }
 variable "worker_instance_count" {
   type = "string"
