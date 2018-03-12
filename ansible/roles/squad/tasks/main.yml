@@ -62,6 +62,15 @@
     group: squad
     mode: 0640
 
+- name: squad secret file
+  register: secret
+  copy:
+    content: "{{django_secret}}"
+    dest: "{{install_base}}/data/squad/secret.dat"
+    owner: root
+    group: squad
+    mode: 0640
+
 - name: environment file
   register: environmentfile
   template:
