@@ -11,3 +11,14 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4XbnFOoWpbwEiX0k6YsJQteanZft5E8IuzZ
 
 # mwasilew's ssh key
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLg0a071B8RSBVYxXoGa/dMZ7jaiLdEM8tmMIg0VTFAh8xPOUIJ8HWurQdc+mq6mMtBFqKGJ5YshLEXK//CKRW+lR+2eTEpjMLfoOR7u1zxU35+lAxbVavOwEHzjaPaGypmaqwWvNdlgsg2gl5Qo7B2f9nEnHtieAW7qI/1agjorB8/I12H2H2iC7GWKptRq1wPRp2sgwq2Bk286xTOESFV+iv0tzT5GepJUexXmF69xqlkW5uznA7LV8DqPQk/5n42K8i5gMjH+ulEDTc1/aMVjjTaSIEbEsvyvhXCXa7PpCRdXT/vodKHnRUwJPu5lkX5m9WSpl6E0RdqQY/3WTn mwasilew" >> /home/ubuntu/.ssh/authorized_keys
+
+retry() {
+    n=1
+    while [ "$n" -le 10 ] && ! "$@"; do
+        sleep $((n*5))s
+        n=$((n+1))
+    done
+    [ "$n" -le 10 ]
+}
+retry sudo apt-get update
+retry sudo apt-get install -qy python3
