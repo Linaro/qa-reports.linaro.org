@@ -2,6 +2,7 @@
   apt: pkg={{item}} state=installed update-cache=yes
   with_items:
     - build-essential
+    - postfix
     - python3
     - python3-dev
     - python-virtualenv
@@ -12,3 +13,38 @@
     - libsasl2-dev
     - libyaml-dev
 
+- name: sasl_passwd
+  register: sasl_passwd
+  template:
+    src: roles/base/templates/sasl_passwd
+    dest: /etc/postfix/sasl_passwd
+
+- name: hash sasl_passwd
+  shell: postmap /etc/postfix/sasl_passwd
+  when: sasl_passwd.changed
+
+- name: tls_policy
+  register: tls_policy
+  template:
+    src: roles/base/templates/tls_policy
+    dest: /etc/postfix/tls_policy
+
+- name: hash tls_policy
+  shell: postmap /etc/postfix/tls_policy
+  when: tls_policy.changed
+
+- name: config postfix
+  register: postconf
+  lineinfile:
+    path: /etc/postfix/main.cf
+    line: '{{item}}'
+  with_items:
+    - 'relayhost = email-smtp.us-east-1.amazonaws.com'
+    - 'smtp_sasl_auth_enable = yes'
+    - 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
+    - 'smtp_sasl_security_options ='
+    - 'smtp_tls_policy_maps = hash:/etc/postfix/tls_policy'
+
+- name: reload postfix
+  shell: systemctl reload postfix
+  when: postconf.changed
