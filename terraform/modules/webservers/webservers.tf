@@ -14,7 +14,7 @@ variable "canonical_dns_name" { type = "string" }
 # Optional variables
 variable "www_instance_type" {
   type = "string"
-  default = "t2.micro"
+  default = "t2.small"
 }
 variable "www_instance_count" {
   type = "string"
@@ -22,7 +22,7 @@ variable "www_instance_count" {
 }
 variable "worker_instance_type" {
   type = "string"
-  default = "t2.micro"
+  default = "t2.small"
 }
 variable "worker_instance_count" {
   type = "string"
@@ -72,6 +72,11 @@ resource "aws_security_group" "qa-reports-lb-sg" {
   }
 }
 
+data "aws_subnet" "oursubnets" {
+  count = "${length(values(var.availability_zone_to_subnet_map))}"
+  id = "${element(values(var.availability_zone_to_subnet_map), count.index)}"
+}
+
 # Instance security group to access the instances over SSH and HTTP
 resource "aws_security_group" "qa-reports-ec2-www" {
   name        = "${var.environment}-qa-reports ec2 www"
@@ -86,12 +91,33 @@ resource "aws_security_group" "qa-reports-ec2-www" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # HTTP access from anywhere
+  # HTTP access from local network
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+
+  # RabbitMQ clustering traffic inside local network
+  # source: https://www.rabbitmq.com/networking.html
+  ingress {
+    from_port   = 4369
+    to_port     = 4369
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+  ingress {
+    from_port   = 5671
+    to_port     = 5672
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+  ingress {
+    from_port   = 25672
+    to_port     = 25672
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
   }
 
   # outbound internet access
@@ -125,6 +151,17 @@ resource "aws_lb_listener" "qa-reports-lb-listener-80" {
     type             = "forward"
   }
 }
+resource "aws_lb_listener" "qa-reports-lb-listener-443" {
+  load_balancer_arn = "${aws_lb.qa-reports-lb.arn}"
+  port = 443
+  protocol = "HTTPS"
+  certificate_arn = "${aws_acm_certificate.acm-cert.arn}"
+  default_action {
+    target_group_arn = "${aws_lb_target_group.qa-reports-tg.arn}"
+    type             = "forward"
+  }
+}
+
 resource "aws_route53_record" "qa-reports-lb-dns" {
   zone_id = "${var.route53_zone_id}"
   name = "${local.local_dns_name}"
@@ -160,18 +197,7 @@ resource "aws_instance" "qa-reports-www" {
   # len(availability_zones) it will wrap.
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
-  # Initial host provisioning.
-  provisioner "file" {
-    source      = "scripts/provision.sh"
-    destination = "provision.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x provision.sh",
-      "./provision.sh",
-    ]
-  }
+  user_data = "${file("scripts/provision.sh")}"
 
   tags {
     Name = "${var.environment}-qa-reports-www-${count.index}"
@@ -220,17 +246,7 @@ resource "aws_instance" "qa-reports-worker" {
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
   # Initial host provisioning.
-  provisioner "file" {
-    source      = "scripts/provision.sh"
-    destination = "provision.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x provision.sh",
-      "./provision.sh",
-    ]
-  }
+  user_data = "${file("scripts/provision.sh")}"
 
   tags {
     Name = "${var.environment}-qa-reports-worker-${count.index}"

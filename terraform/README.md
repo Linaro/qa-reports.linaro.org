@@ -9,40 +9,39 @@ This terraform repository stands up qa-reports.linaro.org's AWS infrastructure i
 
 # Usage
 
+There is a `terraform` wrapper in this directory. It loads all environment
+necessary to do a full deploy, and also handles switching into the `qa-admin`
+role.
+
+
 ## Prerequisites
 
-The qa-reports ssh key should be in your ssh agent. This is used to log into
-the ec2 host for initial bootstrapping:
+You must create a file called `auth.conf` in the same directory as this README,
+with the following contents:
 
-    ssh-add ~/.ssh/qa-reports.pem
+```
+aws_profile=xxxxxxxxxx
+aws_mfa_serial=arn:aws:iam::xxxxxxxxxxxxxx:mfa/first.last
+```
 
-AWS credentials and the AWS role 'qa-admin' should be assumed and set in your
-environmnet (command quoted is a local shell function):
+`aws_profile` is the name of a profile in your local aws credentials, i.e.
+`~/.aws/config` and `~/.aws/credentials`.
 
-    assume-ctt-qa-admin 123456
-
-The database password is loaded into your environment. This will set
-QA_REPORTS_DB_PASS_STAGING or QA_REPORTS_DB_PASS_PRODUCTION, using the
-encrypted group_vars files in ../ansible/group_vars:
-
-    eval $(./scripts/load_db_password staging)
-    eval $(./scripts/load_db_password production)
+`aws_mfa_serial` serial is the serial number of your MFA device.
 
 ## Deploy
 
-Plan the deployment:
+```
+./terraform          # by default runs `terraform plan`
+./terraform apply    # runs the specified command
+```
 
-    make plan # staging is default
-    make plan ENV=production # production plan
+By default the wrapper will act on the `staging` environment. To specifiy a
+different environment, set `$ENV`:
 
-Do the deployment:
-
-    make apply # staging
-    make apply ENV=production # production
-
-Update ansible's inventory:
-
-    make inventory
+```
+ENV=production ./terraform apply
+```
 
 # Caveats
 

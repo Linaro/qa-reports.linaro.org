@@ -2,3 +2,4 @@
 hosts.local
 *.swp
 .terraform.tfstate.lock.info
+/tmp

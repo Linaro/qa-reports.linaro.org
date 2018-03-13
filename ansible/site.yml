@@ -1,13 +1,28 @@
 ---
-- name: Configure service
+
+- name: Make basic configuration
   hosts: all
   roles:
     - base
     - squad
   handlers:
+    - name: restart-rabbitmq
+      command: systemctl restart rabbitmq-server
+
+- name: Configure frontends
+  hosts: webservers
+  roles:
+    - frontend
+  handlers: &handlers
     - name: reload-systemd
       command: systemctl daemon-reload
     - name: reload-apache2
       command: systemctl reload apache2
     - name: restart-apache2
       command: systemctl reload apache2
+
+- name: Configure workers
+  hosts: workers
+  roles:
+    - worker
+  handlers: *handlers

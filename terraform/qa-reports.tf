@@ -20,6 +20,7 @@ variable "ami_id" { type = "string" }
 variable "route53_zone_id" { type = "string" }
 variable "vpc_id" { type = "string" }
 variable "region" { type = "string" }
+variable "node_type" { type = "string" }
 variable "qa_reports_db_pass_production" {
   type = "string"
   # this will cause a failure at apply time if needed but not set
@@ -45,6 +46,8 @@ provider "aws" {
 module "webservers" {
   source = "modules/webservers"
   environment = "${var.environment}"
+  www_instance_type = "${var.node_type}"
+  worker_instance_type = "${var.node_type}"
   vpc_id = "${var.vpc_id}"
   availability_zone_to_subnet_map = "${var.availability_zone_to_subnet_map}"
   ssh_key_path = "${var.ssh_key_path}"
@@ -57,6 +60,7 @@ module "webservers" {
 module "rds" {
   source = "modules/rds"
   environment = "${var.environment}"
+  db_host_size = "${var.node_type}"
   availability_zone_to_subnet_map = "${var.availability_zone_to_subnet_map}"
   vpc_id = "${var.vpc_id}"
   instance_security_groups = ["${module.webservers.qa-reports-ec2-worker-sg-id}",

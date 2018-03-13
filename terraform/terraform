@@ -1,0 +1,73 @@
+#!/bin/sh
+
+set -eu
+
+ENV=${ENV:-staging}
+
+conf=$(dirname $0)/auth.conf
+if [ -r "$conf" ]; then
+    . "$conf"
+fi
+if [ -z "${aws_profile:-}" ] || [ -z "${aws_mfa_serial:-}" ]; then
+    echo "E: Both \$aws_profile and \$aws_mfa_serial must be set."
+    echo "I: Either set them in the environment, or in $conf"
+    exit 1
+fi
+
+# data
+role=arn:aws:iam::495570029050:role/qa-admin
+duration=3600
+
+# assume the qa-admin role
+credentials_dir=$HOME/.cache/qa-reports.linaro.org
+credentials="$credentials_dir/admin_credentials"
+mkdir -p "$credentials_dir"
+chmod 700 "$credentials_dir"
+
+if [ -e "$credentials" ]; then
+    now=$(date +%s)
+    credentials_created=$(stat --format=%Y "$credentials")
+    if [ $((now - credentials_created)) -gt 3600 ]; then
+        rm -f "$credentials"
+    fi
+fi
+if [ ! -e "$credentials" ] || [ ! -s "$credentials" ]; then
+    read -p "MFA token: " token
+    touch "$credentials"
+    chmod 600 "$credentials"
+    aws --profile "$aws_profile" \
+        --region us-east-1 \
+        sts assume-role \
+        --role-arn "$role"  \
+        --role-session-name "`whoami`" \
+        --duration-seconds "$duration" \
+        --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+        --serial-number "$aws_mfa_serial" \
+        --token-code "$token" \
+        --output text \
+        >> "$credentials"
+fi
+
+export AWS_ACCESS_KEY_ID="$(awk '{print($1)}' "$credentials")"
+export AWS_SECRET_ACCESS_KEY="$(awk '{print($2)}' "$credentials")"
+export AWS_SESSION_TOKEN="$(awk '{print($3)}' "$credentials")"
+
+# environment
+./scripts/set_env.sh "$ENV"
+eval $(./scripts/load_db_password "$ENV")
+
+# init if needed
+if [ ! -d .terraform ]; then
+    terraform init
+fi
+
+if [ $# -eq 0 ]; then
+    set -- plan .
+fi
+
+export TF_CLI_ARGS="-var-file=shared.tfvars -var-file=${ENV}.tfvars"
+
+terraform "$@"
+
+# set the stage for ansible
+terraform state pull | ./scripts/state_to_ansible_inventory.py > "../ansible/hosts.${ENV}"

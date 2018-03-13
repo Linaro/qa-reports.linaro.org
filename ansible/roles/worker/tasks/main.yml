@@ -1,0 +1,15 @@
+- name: systemd service - worker
+  template:
+    src: roles/worker/templates/squad-worker.service
+    dest: /etc/systemd/system/squad-worker.service
+  notify: reload-systemd
+  register: squad_worker_service
+
+- command: systemctl enable squad-worker.service
+  changed_when: False
+
+- command: systemctl restart squad-worker.service
+  name: restart squad-worker
+  when: squad_worker_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
+  changed_when: False
+
