@@ -45,6 +45,13 @@
     - 'smtp_sasl_security_options ='
     - 'smtp_tls_policy_maps = hash:/etc/postfix/tls_policy'
 
+- name: reset postfix relayhost
+  register: reset_relayhost
+  lineinfile:
+    state: absent
+    line: 'relayhost = '
+    path: /etc/postfix/main.cf
+
 - name: reload postfix
   shell: systemctl reload postfix
-  when: postconf.changed
+  when: postconf.changed or reset_relayhost.changed
