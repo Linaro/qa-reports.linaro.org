@@ -1,6 +1,4 @@
-install_base: /srv/{{inventory_hostname}}
+install_base: /srv/{{server_name}}
 site_name: "Linaro QA (beta)"
-lava_listener_install_base: /srv/lava.{{inventory_hostname}}
-kernelci_monitor_install_base: /srv/kernelci.{{inventory_hostname}}
 squad_version:
 linaro_ldap: false
