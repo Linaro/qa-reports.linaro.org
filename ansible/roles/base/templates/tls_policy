@@ -1,1 +1,1 @@
-email-smtp.us-east-1.amazonaws.com encrypt
+{{ec2_smtp_server}} encrypt

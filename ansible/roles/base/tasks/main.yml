@@ -41,10 +41,10 @@
     path: /etc/postfix/main.cf
     line: '{{item}}'
   with_items:
-    - 'relayhost = email-smtp.us-east-1.amazonaws.com'
+    - 'relayhost = {{ec2_smtp_server}}'
     - 'smtp_sasl_auth_enable = yes'
     - 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
-    - 'smtp_sasl_security_options ='
+    - 'smtp_sasl_security_options = noanonymous'
     - 'smtp_tls_policy_maps = hash:/etc/postfix/tls_policy'
 
 - name: reset postfix relayhost

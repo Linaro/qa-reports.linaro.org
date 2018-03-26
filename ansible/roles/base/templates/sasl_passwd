@@ -1,1 +1,1 @@
-email-smtp.us-east-1.amazonaws.com {{ec2_smtp_auth}}
+{{ec2_smtp_server}} {{ec2_smtp_auth}}
