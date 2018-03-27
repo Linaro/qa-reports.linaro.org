@@ -18,8 +18,19 @@
   args:
     creates: "{{install_base}}/bin/python3"
 
+- name: Copy squad package, if any
+  copy:
+    src: "{{squad}}"
+    dest: "{{install_base}}/{{squad}}"
+    owner: root
+    group: root
+    mode: 0644
+  when: 'squad != "squad"'
+
 - name: Install squad
-  command: "{{install_base}}/bin/pip install -U squad{{squad_version}} psycopg2"
+  command: "{{install_base}}/bin/pip install -U {{squad}} psycopg2"
+  args:
+    chdir: '{{install_base}}'
   register: install_squad
   changed_when: "('up-to-date: squad' not in install_squad.stdout) or
                 ('up-to-date: psycopg2' not in install_squad.stdout)"

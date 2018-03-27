@@ -1,4 +1,4 @@
 install_base: /srv/{{server_name}}
 site_name: "Linaro QA (beta)"
-squad_version:
+squad: squad
 linaro_ldap: false
