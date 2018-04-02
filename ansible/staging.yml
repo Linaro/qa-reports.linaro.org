@@ -1,8 +1,0 @@
----
-- name: Configure staging to automatically upgrade to master
-  hosts: all
-  roles:
-    - staging
-  handlers:
-    - name: reload-systemd
-      command: systemctl daemon-reload

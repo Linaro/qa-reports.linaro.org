@@ -1,9 +1,0 @@
-#!/bin/sh
-
-set -eu
-
-cat > /dev/null
-printf "Content-Type: text/plain\r\n\r\n"
-
-echo | amqp-publish -r squad-staging
-echo "OK"
