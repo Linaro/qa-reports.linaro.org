@@ -38,7 +38,7 @@
 - name: config postfix
   register: postconf
   lineinfile:
-    path: /etc/postfix/main.cf
+    dest: /etc/postfix/main.cf
     line: '{{item}}'
   with_items:
     - 'relayhost = {{ec2_smtp_server}}'
@@ -52,7 +52,7 @@
   lineinfile:
     state: absent
     line: 'relayhost = '
-    path: /etc/postfix/main.cf
+    dest: /etc/postfix/main.cf
 
 - name: reload postfix
   shell: systemctl reload postfix
