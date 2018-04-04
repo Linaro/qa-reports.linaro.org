@@ -1,8 +1,0 @@
-[production]
-qa-reports.linaro.org
-
-[staging]
-staging-qa-reports.linaro.org
-
-[dev]
-qa-reports.local ansible_user=vagrant ansible_ssh_extra_args="-F .vagrant/ssh_config"
