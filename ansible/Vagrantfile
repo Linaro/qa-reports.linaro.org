@@ -2,13 +2,25 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.network :forwarded_port, host: 8080, guest: 80
-  config.vm.box = "ubuntu/xenial64"
+
+  config.vm.define "master" do |master|
+    master.vm.box = "ubuntu/xenial64"
+    master.vm.hostname = "qa-reports-master"
+
+    master.vm.network :forwarded_port, host: 8080, guest: 80
+  end
+
+  config.vm.define "worker" do |worker|
+    worker.vm.box = "ubuntu/xenial64"
+    worker.vm.hostname = 'qa-reports-worker'
+  end
+
   config.vm.provider :libvirt do |domain|
     domain.memory = 1024
     domain.cpus = 2
   end
+
   config.vm.provision "shell", inline: <<-SHELL
-  DEBIAN_FRONTEND=noninteractive apt-get install -qy python
+  DEBIAN_FRONTEND=noninteractive apt-get install -qy avahi-daemon python3
   SHELL
 end

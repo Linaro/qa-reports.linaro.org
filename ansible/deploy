@@ -16,7 +16,7 @@ basedir=$(dirname $0)
 
 extra_arg=''
 if [ "$env" = 'dev' ] && [ -d .vagrant ]; then
-    vagrant ssh-config | sed -e 's/^Host.*/Host qa-reports.local/'> .vagrant/ssh_config
+    vagrant ssh-config > .vagrant/ssh_config
 fi
 
 inventory="${basedir}/hosts.${env}"

@@ -1,0 +1,14 @@
+[webservers]
+qa-reports-master.local ansible_host=master master_node=1
+[workers]
+qa-reports-worker.local ansible_host=worker
+[dev:children]
+webservers
+workers
+[dev:vars]
+master_node=0
+ansible_ssh_extra_args="-F .vagrant/ssh_config"
+master_hostname=qa-reports-master.local
+database_hostname=qa-reports-master.local
+ansible_ssh_common_args="-o StrictHostKeyChecking=no"
+ansible_python_interpreter=/usr/bin/python3
