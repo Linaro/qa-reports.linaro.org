@@ -20,6 +20,7 @@
   template:
     src: roles/base/templates/sasl_passwd
     dest: /etc/postfix/sasl_passwd
+  when: 'ec2_smtp_server != ""'
 
 - name: hash sasl_passwd
   shell: postmap /etc/postfix/sasl_passwd
@@ -30,6 +31,7 @@
   template:
     src: roles/base/templates/tls_policy
     dest: /etc/postfix/tls_policy
+  when: 'ec2_smtp_server != ""'
 
 - name: hash tls_policy
   shell: postmap /etc/postfix/tls_policy
@@ -46,6 +48,7 @@
     - 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
     - 'smtp_sasl_security_options = noanonymous'
     - 'smtp_tls_policy_maps = hash:/etc/postfix/tls_policy'
+  when: 'ec2_smtp_server != ""'
 
 - name: reset postfix relayhost
   register: reset_relayhost

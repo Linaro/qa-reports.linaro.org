@@ -1,5 +1,9 @@
 site_name: "Linaro QA DEV"
 linaro_ldap: false
+database_is_local: true
+database_hostname: qa-reports-master.local
+database_name: squad
+database_user: squad
 database_password: squad
 server_name: qa-reports-master.local
 server_alias: qa-reports-master-alias.local

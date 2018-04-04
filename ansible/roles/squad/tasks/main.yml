@@ -1,3 +1,7 @@
+- include_tasks: dev.yml
+  when: master_node and database_is_local is defined
+
+
 - name: Install message broker packages
   apt: pkg={{item}} state=installed update-cache=yes
   when: master_node
