@@ -8,5 +8,6 @@ database_password: squad
 server_name: qa-reports-master.local
 server_alias: qa-reports-master-alias.local
 django_secret: 1234567890
-ec2_smtp_server:
-ec2_smtp_auth: xxxxxxxxxxxxxxxxxxxxx
+# ec2_smtp_* must be undefined in dev:
+# ec2_smtp_server:
+# ec2_smtp_auth: xxxxxxxxxxxxxxxxxxxxx
