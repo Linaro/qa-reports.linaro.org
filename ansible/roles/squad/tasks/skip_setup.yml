@@ -1,0 +1,19 @@
+- command: '/bin/true'
+  register: settings
+  changed_when: false
+
+- command: '/bin/true'
+  register: linaro_ldap_backends
+  changed_when: false
+
+- command: '/bin/true'
+  register: install_django_ldap
+  changed_when: false
+
+- command: '/bin/true'
+  register: secret
+  changed_when: false
+
+- command: '/bin/true'
+  register: environmentfile
+  changed_when: false

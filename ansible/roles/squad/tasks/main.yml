@@ -1,26 +1,15 @@
+- include_role:
+    name: base
+  when: upgrade_only is not defined
+
 - include_tasks: dev.yml
-  when: master_node and database_is_local is defined
+  when: upgrade_only is not defined and master_node and database_is_local is defined
 
+- include_tasks: setup.yml
+  when: upgrade_only is not defined
 
-- name: Install message broker packages
-  apt: pkg={{item}} state=installed update-cache=yes
-  when: master_node
-  with_items:
-    - rabbitmq-server
-
-- name: RabbitMQ config
-  when: master_node
-  template:
-    src: roles/squad/templates/rabbitmq.config
-    dest: /etc/rabbitmq/rabbitmq.config
-  notify: restart-rabbitmq
-
-- meta: flush_handlers
-
-- name: create virtualenv
-  command: virtualenv --python=/usr/bin/python3 {{install_base}}
-  args:
-    creates: "{{install_base}}/bin/python3"
+- include_tasks: skip_setup.yml
+  when: upgrade_only is defined
 
 - name: Copy squad package, if any
   copy:
@@ -39,76 +28,10 @@
   changed_when: "('up-to-date: squad' not in install_squad.stdout) or
                 ('up-to-date: psycopg2' not in install_squad.stdout)"
 
-- name: get python path
-  shell: "{{install_base}}/bin/python3 -c 'import sys; print(sys.path[-1])'"
-  register: python_path
-  changed_when: False
-
-- name: install linaro_ldap_backends
-  register: linaro_ldap_backends
-  when: linaro_ldap
-  template:
-    src: roles/squad/templates/linaro_ldap_backends.py
-    dest: '{{python_path.stdout}}/linaro_ldap_backends.py'
-
 - name: install Linaro-specific SQUAD plugins
   command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed squad-linaro-plugins"
   register: install_squad_linaro_plugins
   changed_when: "'up-to-date: squad-linaro-plugins' not in install_squad_linaro_plugins.stdout"
-
-- name: install Django ldap auth module
-  command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed django-auth-ldap"
-  register: install_django_ldap
-  changed_when: "'up-to-date: django-auth-ldap' not in install_django_ldap.stdout"
-
-- user:
-    name: squad
-    home: "{{install_base}}"
-    createhome: no
-    shell: /bin/bash
-
-- name: Linaro LDAP settings file
-  register: settings
-  when: linaro_ldap
-  copy:
-    src: secrets/linaro_ldap.py
-    dest: "{{install_base}}/linaro_ldap.py"
-    owner: root
-    group: squad
-    mode: 0640
-
-- name: data directory
-  file:
-    path: "{{install_base}}/data/squad"
-    owner: squad
-    group: squad
-    mode: 0755
-    state: directory
-
-- name: squad secret file
-  register: secret
-  copy:
-    content: "{{django_secret}}"
-    dest: "{{install_base}}/data/squad/secret.dat"
-    owner: root
-    group: squad
-    mode: 0640
-
-- name: environment file
-  register: environmentfile
-  template:
-    src: roles/squad/templates/environment
-    dest: '{{install_base}}/environment'
-
-- name: .bashrc
-  template:
-    src: roles/squad/templates/bashrc
-    dest: '{{install_base}}/.bashrc'
-
-- name: .bash_profile
-  template:
-    src: roles/squad/templates/bash_profile
-    dest: '{{install_base}}/.bash_profile'
 
 - command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin migrate'
   name: migrate database

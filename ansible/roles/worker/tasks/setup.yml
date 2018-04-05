@@ -1,0 +1,9 @@
+- name: systemd service - worker
+  template:
+    src: roles/worker/templates/squad-worker.service
+    dest: /etc/systemd/system/squad-worker.service
+  notify: reload-systemd
+  register: squad_worker_service
+
+- command: systemctl enable squad-worker.service
+  changed_when: False

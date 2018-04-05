@@ -1,23 +1,8 @@
-- name: Install webserver packages
-  apt: pkg={{item}} state=installed update-cache=yes
-  with_items:
-    - apache2
+- include_tasks: setup.yml
+  when: upgrade_only is not defined
 
-- name: Enable required apache2 modules
-  command: a2enmod proxy proxy_balancer lbmethod_byrequests proxy_http rewrite ssl cgid headers
-  register: result
-  changed_when: "'Enabling module' in result.stdout"
-  notify: restart-apache2
-
-- name: systemd service - web
-  template:
-    src: roles/frontend/templates/squad.service
-    dest: /etc/systemd/system/squad.service
-  notify: reload-systemd
-  register: squad_service
-
-- command: systemctl enable squad.service
-  changed_when: False
+- include_tasks: skip_setup.yml
+  when: upgrade_only is defined
 
 - command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin collectstatic --no-input -v 0'
   name: collect static files
@@ -34,24 +19,6 @@
   name: restart squad
   when: environmentfile.changed  or install_squad_linaro_plugins.changed
   changed_when: False
-  notify: reload-apache2
-
-- file:
-    path: "{{install_base}}/www"
-    owner: root
-    group: root
-    mode: 0555
-    state: directory
-
-- name: apache2 config
-  template:
-    src: roles/frontend/templates/apache2.conf
-    dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
-  notify: reload-apache2
-
-- command: a2ensite {{inventory_hostname}}
-  register: result
-  changed_when: "'Enabling site' in result.stdout"
   notify: reload-apache2
 
 - name: Configure singleton services

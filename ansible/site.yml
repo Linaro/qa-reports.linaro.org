@@ -3,7 +3,6 @@
 - name: Make basic configuration
   hosts: all
   roles:
-    - base
     - squad
   handlers:
     - name: restart-rabbitmq

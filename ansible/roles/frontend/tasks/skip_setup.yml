@@ -1,0 +1,5 @@
+- command: '/bin/true'
+  changed_when: false
+  register: squad_service
+  when: upgrade_only is defined
+

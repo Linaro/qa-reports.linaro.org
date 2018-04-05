@@ -1,12 +1,8 @@
-- name: systemd service - worker
-  template:
-    src: roles/worker/templates/squad-worker.service
-    dest: /etc/systemd/system/squad-worker.service
-  notify: reload-systemd
-  register: squad_worker_service
+- include_tasks: setup.yml
+  when: upgrade_only is not defined
 
-- command: systemctl enable squad-worker.service
-  changed_when: False
+- include_tasks: skip_setup.yml
+  when: upgrade_only is defined
 
 - command: systemctl restart squad-worker.service
   name: restart squad-worker

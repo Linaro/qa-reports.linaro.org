@@ -1,0 +1,7 @@
+- register: squad_listener_service
+  command: '/bin/true'
+  changed_when: false
+
+- register: squad_scheduler_service
+  command: '/bin/true'
+  changed_when: false
