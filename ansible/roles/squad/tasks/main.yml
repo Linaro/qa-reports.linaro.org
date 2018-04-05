@@ -21,12 +21,11 @@
   when: 'squad != "squad"'
 
 - name: Install squad
-  command: "{{install_base}}/bin/pip install -U {{squad}} psycopg2"
+  command: "{{install_base}}/bin/pip install -U {{squad}}"
   args:
     chdir: '{{install_base}}'
   register: install_squad
-  changed_when: "('up-to-date: squad' not in install_squad.stdout) or
-                ('up-to-date: psycopg2' not in install_squad.stdout)"
+  changed_when: "'up-to-date: squad' not in install_squad.stdout"
 
 - name: install Linaro-specific SQUAD plugins
   command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed squad-linaro-plugins"

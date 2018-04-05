@@ -30,6 +30,13 @@
     src: roles/squad/templates/linaro_ldap_backends.py
     dest: '{{python_path.stdout}}/linaro_ldap_backends.py'
 
+- name: install psycopg2
+  command: "{{install_base}}/bin/pip install -U psycopg2"
+  args:
+    chdir: '{{install_base}}'
+  register: install_psycopg2
+  changed_when: "'up-to-date: psycopg2' not in install_psycopg2.stdout"
+
 - name: install Django ldap auth module
   command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed django-auth-ldap"
   register: install_django_ldap

@@ -3,6 +3,10 @@
   changed_when: false
 
 - command: '/bin/true'
+  register: install_psycopg2
+  changed_when: false
+
+- command: '/bin/true'
   register: linaro_ldap_backends
   changed_when: false
 
