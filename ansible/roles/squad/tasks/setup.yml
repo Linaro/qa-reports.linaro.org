@@ -31,7 +31,7 @@
     dest: '{{python_path.stdout}}/linaro_ldap_backends.py'
 
 - name: install psycopg2
-  command: "{{install_base}}/bin/pip install -U psycopg2"
+  command: "{{install_base}}/bin/pip install -U --no-binary :all: psycopg2"
   args:
     chdir: '{{install_base}}'
   register: install_psycopg2
