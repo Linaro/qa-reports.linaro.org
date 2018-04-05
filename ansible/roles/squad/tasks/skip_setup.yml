@@ -1,23 +1,23 @@
-- command: '/bin/true'
+- assert: { that: "true" }
   register: settings
   changed_when: false
 
-- command: '/bin/true'
+- assert: { that: "true" }
   register: install_psycopg2
   changed_when: false
 
-- command: '/bin/true'
+- assert: { that: "true" }
   register: linaro_ldap_backends
   changed_when: false
 
-- command: '/bin/true'
+- assert: { that: "true" }
   register: install_django_ldap
   changed_when: false
 
-- command: '/bin/true'
+- assert: { that: "true" }
   register: secret
   changed_when: false
 
-- command: '/bin/true'
+- assert: { that: "true" }
   register: environmentfile
   changed_when: false

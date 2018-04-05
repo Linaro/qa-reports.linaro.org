@@ -1,3 +1,3 @@
-- command: '/bin/true'
+- assert: { that: "true" }
   register: squad_worker_service
   changed_when: false
