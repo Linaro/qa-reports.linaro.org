@@ -2,13 +2,19 @@
     name: base
   when: upgrade_only is not defined
 
-- include_tasks: dev.yml
+- include_role:
+    name: squad
+    tasks_from: dev.yml
   when: upgrade_only is not defined and master_node and database_is_local is defined
 
-- include_tasks: setup.yml
+- include_role:
+    name: squad
+    tasks_from: setup.yml
   when: upgrade_only is not defined
 
-- include_tasks: skip_setup.yml
+- include_role:
+    name: squad
+    tasks_from: skip_setup.yml
   when: upgrade_only is defined
 
 - name: Copy squad package, if any

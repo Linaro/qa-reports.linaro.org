@@ -15,5 +15,7 @@
     - libsasl2-dev
     - libyaml-dev
 
-- include_tasks: postfix.yml
+- include_role:
+    name: base
+    tasks_from: postfix.yml
   when: 'upgrade_only is not defined and ec2_smtp_server is defined'

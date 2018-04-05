@@ -1,7 +1,11 @@
-- include_tasks: setup.yml
+- include_role:
+    name: worker
+    tasks_from: setup.yml
   when: upgrade_only is not defined
 
-- include_tasks: skip_setup.yml
+- include_role:
+    name: worker
+    tasks_from: skip_setup.yml
   when: upgrade_only is defined
 
 - command: systemctl restart squad-worker.service
