@@ -44,10 +44,10 @@ for host in inventory["webserver"]:
         master = ' master_node=1'
     else:
         master = ''
-    print('{} ansible_host={} ansible_user=ubuntu{}'.format(host['name'], host['ip'], master))
+    print('{} ansible_host={}{}'.format(host['name'], host['ip'], master))
 print("[workers]")
 for host in inventory["worker"]:
-    print('{} ansible_host={} ansible_user=ubuntu'.format(host['name'], host['ip']))
+    print('{} ansible_host={}'.format(host['name'], host['ip']))
 print("[{}:children]".format(environment))
 print("webservers")
 print("workers")
@@ -56,5 +56,6 @@ print("[{}:vars]".format(environment))
 print('master_node=0')
 print('master_hostname={}'.format(master_hostname))
 print("database_hostname={}".format(database['name']))
+print("ansible_user=ubuntu")
 print('ansible_ssh_common_args="-o StrictHostKeyChecking=no"')
 print('ansible_python_interpreter=/usr/bin/python3')
