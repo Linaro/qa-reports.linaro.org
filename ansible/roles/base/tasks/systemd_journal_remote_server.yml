@@ -1,0 +1,39 @@
+- include_role:
+    name: base
+    tasks_from: systemd_journal_remote_common.yml
+
+- name: systemd journal directory
+  file:
+    path: /var/log/journal
+    state: directory
+    owner: systemd-journal-remote
+    group: systemd-journal-remote
+    mode: 0750
+  register: systemd_journal_dir
+
+- name: restart journald
+  command: systemctl restart systemd-journald.service
+  when: systemd_journal_dir.changed
+
+- name: systemd remote journal configuration directory
+  file:
+    path: /etc/systemd/system/systemd-journal-remote.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: systemd remote journal configuration
+  template:
+    src: roles/base/templates/systemd-journal-remote.conf
+    dest: /etc/systemd/system/systemd-journal-remote.service.d/systemd-journal-remote.conf
+  register: systemd_journal_remote_conf
+
+- name: enable systemd remote journal socket
+  command: systemctl enable systemd-journal-remote.socket
+  changed_when: False
+
+- name: restart systemd remote journal daemon
+  when: systemd_journal_remote_conf.changed
+  shell: |
+    systemctl daemon-reload && systemctl restart systemd-journal-remote.service

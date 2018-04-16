@@ -120,6 +120,14 @@ resource "aws_security_group" "qa-reports-ec2-www" {
     cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
   }
 
+  # systemd remote journal (network logging)
+  ingress {
+    from_port   = 19532
+    to_port     = 19532
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+
   # outbound internet access
   egress {
     from_port   = 0

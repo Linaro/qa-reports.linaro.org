@@ -1,0 +1,27 @@
+- include_role:
+    name: base
+    tasks_from: systemd_journal_remote_common.yml
+
+- name: enabled systemd journal upload
+  command: systemctl enable systemd-journal-upload.service
+  changed_when: False
+
+- file:
+    path: /etc/systemd/journal-upload.conf.d
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- template:
+    src: roles/base/templates/journal-upload.conf
+    dest: /etc/systemd/journal-upload.conf.d/journal-upload.conf
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_journal_upload_conf
+
+- name: restart journal
+  when: systemd_journal_upload_conf.changed
+  shell: |
+    systemctl daemon-reload && systemctl restart systemd-journal-upload.service
