@@ -1,3 +1,24 @@
+- name: update hostname file
+  copy:
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: 0644
+    content: "{{inventory_hostname}}"
+  register: etc_hostname
+
+- name: set hostname
+  command: hostname -F /etc/hostname
+  when: etc_hostname.changed
+
+- name: "Build hosts file"
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{item}}"
+    state: present
+  with_items: "{{ groups['all'] }}"
+
 - name: Install base packages
   apt: pkg={{item}} state=installed update-cache=yes
   with_items:
