@@ -1,15 +1,15 @@
 [webservers]
-staging-qa-reports-www-0 ansible_host=54.208.106.249 master_node=1
-staging-qa-reports-www-1 ansible_host=54.208.184.63
+staging-qa-reports-www-0 ansible_host=54.210.85.118 master_node=1
+staging-qa-reports-www-1 ansible_host=54.144.55.183
 [workers]
-staging-qa-reports-worker-0 ansible_host=54.225.117.63
-staging-qa-reports-worker-1 ansible_host=34.228.195.76
+staging-qa-reports-worker-0 ansible_host=54.234.49.181
+staging-qa-reports-worker-1 ansible_host=54.174.213.0
 [staging:children]
 webservers
 workers
 [staging:vars]
 master_node=0
-master_hostname=ip-172-31-1-233
+master_hostname=ip-172-31-1-152
 database_hostname=terraform-20180223202455880900000001.cuuutnsao02n.us-east-1.rds.amazonaws.com
 ansible_user=ubuntu
 ansible_ssh_common_args="-o StrictHostKeyChecking=no"
