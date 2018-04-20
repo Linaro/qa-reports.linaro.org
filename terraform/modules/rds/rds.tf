@@ -1,4 +1,5 @@
 variable "environment" { type = "string" }
+variable "service_name" { type = "string" }
 variable "db_host_size" { type = "string" }
 variable "rds_db_password" { type = "string" }
 variable "availability_zone_to_subnet_map" { type = "map" }
@@ -11,8 +12,8 @@ variable "instance_security_groups" {
 
 # A security group for the database
 resource "aws_security_group" "qa-reports-db-sg" {
-  name        = "${var.environment}-qa-reports-postgresql"
-  description = "Security group for ${var.environment}-qa-reports database"
+  name        = "${var.service_name}-postgresql"
+  description = "Security group for ${var.service_name} database"
   vpc_id      = "${var.vpc_id}"
 
   # Postgres uses port 5432

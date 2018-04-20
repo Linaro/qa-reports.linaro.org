@@ -10,6 +10,7 @@ variable "ami_id" { type = "string" }
 variable "route53_zone_id" { type = "string" }
 variable "route53_base_domain_name" { type = "string" }
 variable "canonical_dns_name" { type = "string" }
+variable "service_name" { type = "string" }
 
 # Optional variables
 variable "www_instance_type" {
@@ -32,7 +33,7 @@ variable "worker_instance_count" {
 # Calculated variables
 locals {
   subnets = "${values(var.availability_zone_to_subnet_map)}"
-  local_dns_name = "${var.environment}-qa-reports.${var.route53_base_domain_name}"
+  local_dns_name = "${var.service_name}.${var.route53_base_domain_name}"
 }
 
 # ACM cert
@@ -44,7 +45,7 @@ resource "aws_acm_certificate" "acm-cert" {
 
 # A security group for the load balancer so it is accessible via the web
 resource "aws_security_group" "qa-reports-lb-sg" {
-  name        = "${var.environment}-qa-reports.linaro.org"
+  name        = "${var.service_name}.linaro.org"
   description = "Security group for load balancer"
   vpc_id      = "${var.vpc_id}"
 
@@ -79,7 +80,7 @@ data "aws_subnet" "oursubnets" {
 
 # Instance security group to access the instances over SSH and HTTP
 resource "aws_security_group" "qa-reports-ec2-www" {
-  name        = "${var.environment}-qa-reports ec2 www"
+  name        = "${var.service_name} ec2 www"
   description = "Default SG for qa-reports webservers"
   vpc_id      = "${var.vpc_id}"
 
@@ -139,13 +140,13 @@ resource "aws_security_group" "qa-reports-ec2-www" {
 output "qa-reports-ec2-www-sg-id" { value = "${aws_security_group.qa-reports-ec2-www.id}" }
 
 resource "aws_lb" "qa-reports-lb" {
-  name = "${var.environment}-qa-reports-lb"
+  name = "${var.service_name}-lb"
 
   subnets = ["${local.subnets}"]
   security_groups = ["${aws_security_group.qa-reports-lb-sg.id}"]
 }
 resource "aws_lb_target_group" "qa-reports-tg" {
-  name = "${var.environment}-qa-reports-tg"
+  name = "${var.service_name}-tg"
   port = 80
   protocol = "HTTP"
   vpc_id = "${var.vpc_id}"
@@ -208,13 +209,13 @@ resource "aws_instance" "qa-reports-www" {
   user_data = "${file("scripts/provision.sh")}"
 
   tags {
-    Name = "${var.environment}-qa-reports-www-${count.index}"
+    Name = "${var.service_name}-www-${count.index}"
   }
 }
 
 # Instance security group to access the instances over SSH
 resource "aws_security_group" "qa-reports-ec2-worker" {
-  name        = "${var.environment}-qa-reports ec2 worker"
+  name        = "${var.service_name} ec2 worker"
   description = "Default SG for qa-reports workers"
   vpc_id      = "${var.vpc_id}"
 
@@ -257,7 +258,7 @@ resource "aws_instance" "qa-reports-worker" {
   user_data = "${file("scripts/provision.sh")}"
 
   tags {
-    Name = "${var.environment}-qa-reports-worker-${count.index}"
+    Name = "${var.service_name}-worker-${count.index}"
   }
 }
 

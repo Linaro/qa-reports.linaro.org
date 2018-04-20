@@ -10,6 +10,7 @@
 
 variable "route53_base_domain_name" { type = "string" }
 variable "canonical_dns_name" { type = "string" }
+variable "service_name" { type = "string" }
 variable "environment" { type = "string" }
 variable "availability_zone_to_subnet_map" { type = "map" }
 variable "ssh_key_path" {
@@ -55,11 +56,13 @@ module "webservers" {
   route53_zone_id = "${var.route53_zone_id}"
   route53_base_domain_name = "${var.route53_base_domain_name}"
   canonical_dns_name = "${var.canonical_dns_name}"
+  service_name = "${var.service_name}"
 }
 
 module "rds" {
   source = "modules/rds"
   environment = "${var.environment}"
+  service_name = "${var.service_name}"
   db_host_size = "${var.node_type}"
   availability_zone_to_subnet_map = "${var.availability_zone_to_subnet_map}"
   vpc_id = "${var.vpc_id}"
