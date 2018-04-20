@@ -4,7 +4,7 @@ availability_zone_to_subnet_map = {
   "us-east-1a" = "subnet-08375ce285b190f06" # 172.31.1.0/24
   "us-east-1b" = "subnet-0197bdcd7f985caa4" # 172.31.2.0/24
 }
-ssh_key_path = "~/.ssh/qa-reports.pub"
+ssh_key_path = "qa-reports.pub"
 route53_zone_id = "Z27NRA2FV79C84" # ctt.linaro.org
 route53_base_domain_name = "ctt.linaro.org"
 

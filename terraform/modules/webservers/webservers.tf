@@ -183,7 +183,7 @@ resource "aws_route53_record" "qa-reports-lb-dns" {
 }
 
 resource "aws_key_pair" "auth" {
-  key_name   = "qa-reports"
+  key_name   = "qa-reports-${var.environment}"
   public_key = "${file(var.ssh_key_path)}"
 }
 
