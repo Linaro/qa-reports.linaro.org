@@ -43,7 +43,7 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 resource "aws_db_instance" "default" {
-    allocated_storage = 20 # minimum
+    allocated_storage = 50
     engine = "postgres"
     instance_class = "db.${var.db_host_size}"
     name = "${var.environment}qareports"
