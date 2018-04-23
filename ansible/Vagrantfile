@@ -6,8 +6,10 @@ Vagrant.configure(2) do |config|
   config.vm.define "master" do |master|
     master.vm.box = "ubuntu/xenial64"
     master.vm.hostname = "qa-reports-master"
-
     master.vm.network :forwarded_port, host: 8080, guest: 80
+    master.vm.provider :libvirt do |domain|
+      domain.machine_virtual_size = 30
+    end
   end
 
   config.vm.define "worker" do |worker|
