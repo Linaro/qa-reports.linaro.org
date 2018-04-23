@@ -81,6 +81,15 @@
     src: roles/squad/templates/environment
     dest: '{{install_base}}/environment'
 
+- name: .pgpass
+  register: pgpass
+  template:
+    src: roles/squad/templates/pgpass
+    dest: '{{install_base}}/.pgpass'
+    owner: squad
+    group: squad
+    mode: 0400
+
 - name: .bashrc
   template:
     src: roles/squad/templates/bashrc

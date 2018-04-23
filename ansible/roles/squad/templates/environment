@@ -1,5 +1,8 @@
 XDG_DATA_HOME={{install_base}}/data
 DATABASE=ENGINE=django.db.backends.postgresql_psycopg2:NAME={{database_name}}:HOST={{database_hostname}}:USER={{database_user}}:PASSWORD={{database_password}}
+PGDATABASE={{database_name}}
+PGHOST={{database_hostname}}
+PGUSER={{database_user}}
 {% if linaro_ldap %}
 SQUAD_EXTRA_SETTINGS={{install_base}}/linaro_ldap.py
 {% endif %}
