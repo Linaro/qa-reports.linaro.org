@@ -32,6 +32,13 @@
     dest: /etc/apache2/sites-available/{{inventory_hostname}}.conf
   notify: reload-apache2
 
+- name: disable default apache site
+  command: a2dissite 000-default.conf
+  register: result
+  when: 'inventory_hostname == "qa-reports-master.local"'
+  changed_when: "'Site 000-default disabled.' in result.stdout"
+  notify: reload-apache2
+
 - command: a2ensite {{inventory_hostname}}
   register: result
   changed_when: "'Enabling site' in result.stdout"
