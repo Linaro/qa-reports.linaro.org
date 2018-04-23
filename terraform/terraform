@@ -3,6 +3,7 @@
 set -eu
 
 ENV=${ENV:-staging}
+export TF_DATA_DIR=.terraform_${ENV}
 
 conf=$(dirname $0)/auth.conf
 if [ -r "$conf" ]; then
@@ -57,7 +58,7 @@ export AWS_SESSION_TOKEN="$(awk '{print($3)}' "$credentials")"
 eval $(./scripts/load_db_password "$ENV")
 
 # init if needed
-if [ ! -d .terraform ]; then
+if [ ! -d "${TF_DATA_DIR}" ]; then
     terraform init
 fi
 
