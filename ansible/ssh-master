@@ -2,12 +2,13 @@
 
 set -eu
 
-if [ $# -ne 1 ]; then
-  echo "usage: $0 ENVIRONMENT"
+if [ $# -lt 1 ]; then
+  echo "usage: $0 ENVIRONMENT [SSH ARGS ...]"
   exit 1
 fi
 
 env="$1"
+shift
 
 inventory=$(dirname $0)/hosts.$env
 
@@ -15,4 +16,4 @@ master=$(awk '/master_node=1/ {sub("ansible_host=", "", $2); print($2)}' "$inven
 user=$(sed -e '/^ansible_user=/!d; s/ansible_user=//' "$inventory")
 ssh_args=$(sed -e '/^ansible_ssh_common_args=/!d; s/^ansible_ssh_common_args="\(.*\)"/\1/' "$inventory")
 
-exec ssh $ssh_args -l "$user" "$master"
+exec ssh $ssh_args -l "$user" "$@" "$master"
