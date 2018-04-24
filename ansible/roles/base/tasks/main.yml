@@ -23,6 +23,7 @@
   apt: pkg={{item}} state=installed update-cache=yes
   with_items:
     - build-essential
+    - htop
     - libldap2-dev
     - libpq-dev
     - libsasl2-dev
