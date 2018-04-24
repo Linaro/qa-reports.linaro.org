@@ -7,7 +7,7 @@ User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
-ExecStart={{install_base}}/bin/squad
+ExecStart={{install_base}}/bin/squad --workers={{number_of_workers}}
 ExecReload=/bin/kill -HUP $MAINPID
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure

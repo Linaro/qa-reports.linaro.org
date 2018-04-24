@@ -9,6 +9,15 @@
   changed_when: "'Enabling module' in result.stdout"
   notify: restart-apache2
 
+- name: calculate number of workers
+  shell: 'echo $(($(nproc)*2 + 1))'
+  register: number_of_workers_results
+  changed_when: False
+
+- name: number of workers
+  set_fact:
+    number_of_workers: "{{number_of_workers_results.stdout}}"
+
 - name: systemd service - web
   template:
     src: roles/frontend/templates/squad.service
