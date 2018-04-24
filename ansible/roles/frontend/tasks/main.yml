@@ -15,13 +15,13 @@
 
 - shell: 'if systemctl is-active squad.service; then systemctl reload squad.service; else systemctl restart squad.service; fi'
   name: start/reload squad
-  when: squad_service.changed or install_squad.changed or settings.changed or linaro_ldap_backends.changed or secret.changed
+  when: install_squad.changed or settings.changed or linaro_ldap_backends.changed or secret.changed
   changed_when: False
   notify: reload-apache2
 
 - shell: systemctl restart squad.service
   name: restart squad
-  when: environmentfile.changed  or install_squad_linaro_plugins.changed
+  when: squad_service.changed or environmentfile.changed or install_squad_linaro_plugins.changed
   changed_when: False
   notify: reload-apache2
 
