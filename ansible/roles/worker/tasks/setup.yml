@@ -5,5 +5,7 @@
   notify: reload-systemd
   register: squad_worker_service
 
+- meta: flush_handlers
+
 - command: systemctl enable squad-worker.service
   changed_when: False

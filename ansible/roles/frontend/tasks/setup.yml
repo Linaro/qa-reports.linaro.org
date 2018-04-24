@@ -16,6 +16,8 @@
   notify: reload-systemd
   register: squad_service
 
+- meta: flush_handlers
+
 - command: systemctl enable squad.service
   changed_when: False
 

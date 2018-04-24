@@ -5,6 +5,8 @@
   notify: reload-systemd
   register: squad_listener_service
 
+- meta: flush_handlers
+
 - command: systemctl enable squad-listener.service
   changed_when: False
 
@@ -19,6 +21,8 @@
     dest: /etc/systemd/system/squad-scheduler.service
   notify: reload-systemd
   register: squad_scheduler_service
+
+- meta: flush_handlers
 
 - command: systemctl enable squad-scheduler.service
   changed_when: False
