@@ -23,18 +23,18 @@
   apt: pkg={{item}} state=installed update-cache=yes
   with_items:
     - build-essential
-    - mailutils
-    - postgresql-client
-    - postfix
-    - python3
-    - python3-dev
-    - python-virtualenv
-    - python-psycopg2
-    - python-httplib2
-    - libpq-dev
     - libldap2-dev
+    - libpq-dev
     - libsasl2-dev
     - libyaml-dev
+    - mailutils
+    - postfix
+    - postgresql-client
+    - python3
+    - python3-dev
+    - python-httplib2
+    - python-psycopg2
+    - python-virtualenv
 
 - include_role:
     name: base
