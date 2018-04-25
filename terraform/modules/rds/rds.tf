@@ -42,6 +42,23 @@ resource "aws_db_subnet_group" "default" {
     Name = "${var.environment}qareports DB subnet group"
   }
 }
+
+resource "aws_db_parameter_group" "default" {
+  name        = "qa-reports-postgresql-params"
+  family      = "postgres9.6"
+  description = "RDS default cluster parameter group"
+
+  parameter {
+    name  = "auto_explain.log_min_duration"
+    value = "2"
+  }
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "2"
+  }
+}
+
 resource "aws_db_instance" "default" {
     allocated_storage = 50
     apply_immediately = true
@@ -52,6 +69,7 @@ resource "aws_db_instance" "default" {
     password = "${var.rds_db_password}"
     availability_zone = "${element(keys(var.availability_zone_to_subnet_map), 0)}"
     db_subnet_group_name = "${aws_db_subnet_group.default.name}"
+    parameter_group_name = "${aws_db_parameter_group.default.name}"
     multi_az = false
     backup_retention_period = 7 # days
     backup_window = "23:20-23:50"
