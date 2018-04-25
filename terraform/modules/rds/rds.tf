@@ -49,16 +49,6 @@ resource "aws_db_parameter_group" "default" {
   description = "RDS default cluster parameter group"
 
   parameter {
-    name = "log_statement"
-    value = "all"
-  }
-
-  parameter {
-    name  = "auto_explain.log_min_duration"
-    value = "500"
-  }
-
-  parameter {
     name  = "log_min_duration_statement"
     value = "500"
   }
