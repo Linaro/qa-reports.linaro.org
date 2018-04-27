@@ -44,7 +44,7 @@ resource "aws_db_subnet_group" "default" {
 }
 
 resource "aws_db_parameter_group" "default" {
-  name        = "qa-reports-postgresql-params"
+  name        = "${var.environment}-qa-reports-postgresql-params"
   family      = "postgres9.6"
   description = "RDS default cluster parameter group"
 
