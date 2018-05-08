@@ -1,5 +1,5 @@
 - name: install systemd remote journal
   apt:
     pkg: systemd-journal-remote
-    state: installed
+    state: present
     update_cache: yes

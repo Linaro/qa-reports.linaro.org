@@ -1,5 +1,5 @@
 - name: Install PostgreSQL
-  apt: pkg={{item}} state=installed update-cache=yes
+  apt: pkg={{item}} state=present update-cache=yes
   when: master_node
   with_items:
     - postgresql

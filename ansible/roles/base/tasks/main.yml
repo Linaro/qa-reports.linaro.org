@@ -20,7 +20,7 @@
   with_items: "{{ groups['all'] }}"
 
 - name: Install base packages
-  apt: pkg={{item}} state=installed update-cache=yes
+  apt: pkg={{item}} state=present update-cache=yes
   with_items:
     - build-essential
     - htop
