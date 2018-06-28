@@ -207,6 +207,7 @@ resource "aws_instance" "qa-reports-www" {
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
   user_data = "${file("scripts/provision.sh")}"
+  iam_instance_profile = "qa_reports_instance_profile"
 
   tags {
     Name = "${var.service_name}-www-${count.index}"
@@ -256,6 +257,7 @@ resource "aws_instance" "qa-reports-worker" {
 
   # Initial host provisioning.
   user_data = "${file("scripts/provision.sh")}"
+  iam_instance_profile = "qa_reports_instance_profile"
 
   tags {
     Name = "${var.service_name}-worker-${count.index}"
