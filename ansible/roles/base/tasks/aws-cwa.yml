@@ -1,0 +1,35 @@
+# Install amazon cloudwatch agent
+- name: Check if amazon cloudwatch agent (cwa) is installed
+  stat:
+    path: /opt/aws/amazon-cloudwatch-agent
+  register: aws_cwa_path
+  changed_when: false
+
+- name: Install cwa dependent packages
+  apt: pkg={{item}} state=present update-cache=yes
+  with_items:
+    - unzip
+
+- block:
+  - name: cwa - make temp dir for installation files
+    file:
+      path: "/tmp/aws-cwa-install"
+      state: "directory"
+  - name: cwa - download & unpack the latest cloudwatch agent .zip
+    unarchive:
+      remote_src: "yes"
+      src: "https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip"
+      dest: "/tmp/aws-cwa-install/"
+  - name: cwa - run the installer
+    shell: dpkg -i -E /tmp/aws-cwa-install/amazon-cloudwatch-agent.deb
+    notify: restart amazon-cloudwatch-agent
+  - name: cwa - remove temp dir
+    file:
+      path: "/tmp/aws-cwa-install/"
+      state: "absent"
+  when: aws_cwa_path.stat.exists != True
+
+- name: Ensure amazon-cloudwatch-agent is running
+  service:
+    name: "amazon-cloudwatch-agent"
+    state: "started"
