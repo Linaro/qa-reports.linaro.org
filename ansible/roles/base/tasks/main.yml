@@ -59,4 +59,6 @@
     name: base
     tasks_from: aws-ssm.yml
   when: ansible_distribution_version == "16.04" and ansible_distribution == "Ubuntu"
+
+# Install AWS CloudWatch Agent
 - include: aws-cwa.yml
