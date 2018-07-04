@@ -270,3 +270,57 @@ resource "aws_lb_target_group_attachment" "qa-reports-www-lb" {
   target_id = "${element(aws_instance.qa-reports-www.*.id, count.index)}"
   port = 80
 }
+
+
+# Cloudwatch Alarms
+resource "aws_sns_topic" "qa_reports_cloudwatch_notifications" {
+  name = "${var.environment}_qa_reports_cloudwatch_notifications"
+}
+
+# For each www instance, monitor disk usage
+resource "aws_cloudwatch_metric_alarm" "www_disk_usage" {
+  alarm_name = "${element(aws_instance.qa-reports-www.*.tags.Name, count.index)}_disk_capacity"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name = "disk_used_percent"
+  namespace = "CWAgent"
+  period = "300"
+  statistic = "Average"
+  threshold = "80"
+  alarm_description = "This alerts if disk_used_percent is above 80%"
+  alarm_actions = ["${aws_sns_topic.qa_reports_cloudwatch_notifications.arn}"]
+  count = "${var.www_instance_count}"
+  dimensions = {
+    path = "/"
+    fstype = "ext4"
+    InstanceId = "${element(aws_instance.qa-reports-www.*.id, count.index)}"
+    device = "xvda1"
+  }
+  insufficient_data_actions = [
+    "${aws_sns_topic.qa_reports_cloudwatch_notifications.arn}"
+  ]
+}
+
+# For each worker instance, monitor disk usage
+resource "aws_cloudwatch_metric_alarm" "worker_disk_usage" {
+  alarm_name = "${element(aws_instance.qa-reports-worker.*.tags.Name, count.index)}_disk_capacity"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name = "disk_used_percent"
+  namespace = "CWAgent"
+  period = "300"
+  statistic = "Average"
+  threshold = "80"
+  alarm_description = "This alerts if disk_used_percent is above 80%"
+  alarm_actions = ["${aws_sns_topic.qa_reports_cloudwatch_notifications.arn}"]
+  count = "${var.worker_instance_count}"
+  dimensions = {
+    path = "/"
+    fstype = "ext4"
+    InstanceId = "${element(aws_instance.qa-reports-worker.*.id, count.index)}"
+    device = "xvda1"
+  }
+  insufficient_data_actions = [
+    "${aws_sns_topic.qa_reports_cloudwatch_notifications.arn}"
+  ]
+}
