@@ -11,9 +11,23 @@
     mode: 0750
   register: systemd_journal_dir
 
+- name: systemd-journald configuration directory
+  file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: systemd-journald configuration
+  template:
+    src: roles/base/templates/journald.conf
+    dest: /etc/systemd/journald.conf.d/journald.conf
+  register: systemd_journald_conf
+
 - name: restart journald
   command: systemctl restart systemd-journald.service
-  when: systemd_journal_dir.changed
+  when: systemd_journal_dir.changed or systemd_journald_conf.changed
 
 - name: systemd remote journal configuration directory
   file:
