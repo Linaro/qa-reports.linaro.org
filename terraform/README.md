@@ -43,6 +43,36 @@ different environment, set `$ENV`:
 ENV=production ./terraform apply
 ```
 
+## CloudWatch
+
+CloudWatch is used to monitor the qa-reports environments. Components:
+- AWS Systems Manager (SSM) - required for cloudwatch. This is installed by
+  default in Ubuntu 18.04+ images, but needs to be installed via ansible in
+  16.04.
+- AWS CloudWatch Agent - Sends custom metrics from the instance, to cloudwatch,
+  such as disk capacity.
+- Simple Notification Service (SNS) - CloudWatch Alarms produce a notification
+  in SNS, which can be subscribed to via email or other protocols.
+
+So, cloudwatch monitoring requires that ssm and the cloudwatch agent are
+installed via ansible. The cloudwatch configuration file in ansible is tightly
+coupled to the cloudwatch alarm definitions in terraform.
+
+Email subscriptions to SNS topics must be done manually in the AWS UI -
+terraform does not support it because email subscriptions require opting in via
+email. To add an email to SNS, log into AWS and navigate to the SNS service.
+Find the appropriate topic, and click subscribe.
+
+To view metrics in AWS, log in and navigate to the 'CloudWatch' service. There,
+you will see the Alarms, and if you click on Metrics in the CWAgent namespace
+you can see everything that is published from the agent.
+
+If an alarm is misconfigured, it may generate an INSUFFICIENT DATA alert. This
+typically means that the cloudwatch agent configuration and the terraform alarm
+config are not matching up. The easiest way to see why is to use the CloudWatch
+Alarm dashboard to determine why the data is not available.
+
+
 # Caveats
 
 ## Availability

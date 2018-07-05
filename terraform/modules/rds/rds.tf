@@ -50,7 +50,7 @@ resource "aws_db_parameter_group" "default" {
 
   parameter {
     name  = "log_min_duration_statement"
-    value = "500"
+    value = 500
   }
 }
 

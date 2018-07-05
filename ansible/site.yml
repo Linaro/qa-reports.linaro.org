@@ -7,6 +7,11 @@
   handlers:
     - name: restart-rabbitmq
       command: systemctl restart rabbitmq-server
+    - name: restart amazon-cloudwatch-agent
+      service:
+        name: "amazon-cloudwatch-agent"
+        state: "restarted"
+
 
 - name: Configure frontends
   hosts: webservers

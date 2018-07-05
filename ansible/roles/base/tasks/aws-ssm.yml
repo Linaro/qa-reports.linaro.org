@@ -1,0 +1,13 @@
+- name: Install AWS SSM
+  become: yes
+  become_user: root
+  apt:
+    deb: "https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb"
+
+- name: Register AWS SSM service
+  become: yes
+  become_user: root
+  service:
+    name: amazon-ssm-agent
+    enabled: yes
+    state: started
