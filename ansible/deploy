@@ -34,6 +34,9 @@ case "$@" in
 esac
 
 export ANSIBLE_CONFIG="${basedir}/ansible.cfg"
+
+ansible --version
+
 exec ansible-playbook \
     $use_vault \
     --inventory-file="$inventory" \
