@@ -42,6 +42,11 @@
   register: install_django_ldap
   changed_when: "'up-to-date: django-auth-ldap' not in install_django_ldap.stdout"
 
+- name: install django_sendmail_backend
+  command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed django_sendmail_backend"
+  register: install_django_sendmail_backend
+  changed_when: "'up-to-date: django_secret' not in install_django_sendmail_backend.stdout"
+
 - user:
     name: squad
     home: "{{install_base}}"
