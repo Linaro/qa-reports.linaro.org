@@ -2,3 +2,4 @@ install_base: /srv/{{server_name}}
 site_name: "Linaro QA (beta)"
 squad: squad
 linaro_ldap: false
+setup_cloudwatch: false

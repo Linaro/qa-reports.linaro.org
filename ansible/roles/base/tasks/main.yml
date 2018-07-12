@@ -58,8 +58,8 @@
 - include_role:
     name: base
     tasks_from: aws-ssm.yml
-  when: upgrade_only is not defined and ansible_distribution_version == "16.04" and ansible_distribution == "Ubuntu"
+  when: setup_cloudwatch and upgrade_only is not defined and ansible_distribution_version == "16.04" and ansible_distribution == "Ubuntu"
 
 # Install AWS CloudWatch Agent
 - include: aws-cwa.yml
-  when: upgrade_only is not defined
+  when: setup_cloudwatch and upgrade_only is not defined
