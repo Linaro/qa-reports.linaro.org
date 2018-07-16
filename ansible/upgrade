@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ $# -lt 1 ]; then
+    echo "usage: $0 dev|staging|production [ansible-opts]"
+    exit 1
+fi
+
+./deploy "$@" --extra-vars upgrade_only=true site.yml
