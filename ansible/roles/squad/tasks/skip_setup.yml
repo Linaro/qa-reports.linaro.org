@@ -15,10 +15,6 @@
   changed_when: false
 
 - assert: { that: "true" }
-  register: install_django_sendmail_backend
-  changed_when: false
-
-- assert: { that: "true" }
   register: secret
   changed_when: false
 
