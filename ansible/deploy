@@ -15,8 +15,8 @@ fi
 basedir=$(dirname $0)
 
 extra_arg=''
-if [ "$env" = 'dev' ] && [ -d .vagrant ]; then
-    vagrant ssh-config > .vagrant/ssh_config
+if [ "$env" = 'dev' ] && [ -d ../.vagrant ]; then
+    vagrant ssh-config > ../.vagrant/ssh_config
 fi
 
 inventory="${basedir}/hosts.${env}"
