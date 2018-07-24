@@ -40,7 +40,7 @@ print("[webservers]")
 master_hostname = None
 for host in inventory["webserver"]:
     if "www-0" in host['name']:
-        master_hostname = host['hostname'].split('.')[0] # get only local part
+        master_hostname = host['name']
         master = ' master_node=1'
     else:
         master = ''
