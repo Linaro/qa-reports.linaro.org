@@ -5,6 +5,6 @@ linaro_ldap: false
 setup_cloudwatch: false
 email_from: root@localhost
 admin_email: root@localhost
-admin_irc: irc://localhost/qa-reports
+admin_irc:
 admin_irc_nick: qa-reports-bot
 admin_irc_cert:
