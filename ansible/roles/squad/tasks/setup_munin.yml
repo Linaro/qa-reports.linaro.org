@@ -34,7 +34,7 @@
   when: master_node
 
 - name: IRC robot client certificate
-  when: master_node and admin_irc_cert is defined
+  when: master_node and admin_irc_cert
   register: irker_cert
   copy:
     src: '{{admin_irc_cert}}'
