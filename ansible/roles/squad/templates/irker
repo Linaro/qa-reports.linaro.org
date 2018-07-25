@@ -1,0 +1,1 @@
+IRKER_OPTIONS='-n {{admin_irc_nick}}{% if admin_irc_cert %} -e /var/lib/irker.pem{% endif %}'

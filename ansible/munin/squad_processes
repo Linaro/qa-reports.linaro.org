@@ -1,0 +1,86 @@
+#!/bin/sh
+#
+# Copyright (c) 2018 Linaro Limited
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; version 2 dated June,
+# 1991.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+# Plugin to monitor SQUAD-related processess
+
+on_master() {
+    if systemctl is-enabled --quiet squad-listener 2>/dev/null; then
+        "$@"
+    fi
+}
+
+on_web() {
+    if systemctl is-enabled --quiet squad 2>/dev/null; then
+        "$@"
+    fi
+}
+
+on_worker() {
+    if systemctl is-enabled --quiet squad-worker 2>/dev/null; then
+        "$@"
+    fi
+}
+
+define() {
+    local field description
+    field="$1"
+    description="$2"
+    echo "${field}.label ${description}"
+    echo "${field}.critical 1:"
+}
+
+count() {
+    pgrep -fac "$@" || true
+}
+
+if [ "$1" = "config" ]; then
+    echo "graph_title SQUAD processes"
+    echo 'graph_args --base 1000 -l 0'
+    echo 'graph_vlabel Tracking of SQUAD processes'
+    echo 'graph_category squad'
+    echo 'graph_info This graph shows the number of SQUAD-related processes running'
+
+    on_master define squad_listener "SQUAD Listener"
+    on_master define squad_scheduler "SQUAD Scheduler"
+
+    on_web define squad_web "SQUAD web backend"
+
+    on_worker define squad_worker "SQUAD worker"
+
+    on_master define rabbitmq "RabbitMQ"
+
+    define postfix Postfix
+else
+    on_master printf "squad_listener.value "
+    on_master count 'squad-admin.listen'
+
+    on_master printf "squad_scheduler.value "
+    on_master count 'celery -A squad beat'
+
+    on_web printf "squad_web.value "
+    on_web count squad.wsgi
+
+    on_worker printf "squad_worker.value "
+    on_worker count 'celery -A squad worker'
+
+    on_master printf "rabbitmq.value "
+    on_master count erlang.*rabbitmq
+
+    printf "postfix.value "
+    count postfix/.*/master
+fi

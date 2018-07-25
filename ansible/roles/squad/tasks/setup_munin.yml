@@ -1,0 +1,134 @@
+########################################################################
+## IRC server setup
+## (used only in local development, for testing)
+########################################################################
+- name: install IRC server for development
+  apt:
+    pkg: inspircd
+    state: present
+    update-cache: yes
+  when: 'master_node and admin_irc and "localhost" in admin_irc'
+
+- name: configure local IRC server if needed
+  lineinfile:
+    state: present
+    dest: /etc/inspircd/inspircd.conf
+    line: '<bind address="0.0.0.0" port="6667" type="clients">'
+    regexp: '^\s*<bind.*>'
+  register: ircd_conf
+  when: 'master_node and admin_irc and "localhost" in admin_irc'
+
+- name: restart local IRC server if needed
+  command: systemctl restart inspircd
+  when: 'master_node and admin_irc and "localhost" in admin_irc and ircd_conf.changed'
+
+########################################################################
+## IRC client setup
+########################################################################
+
+- name: install IRC robot
+  apt:
+    pkg: irker
+    state: present
+    update-cache: yes
+  when: master_node
+
+- name: IRC robot client certificate
+  when: master_node and admin_irc_cert is defined
+  register: irker_cert
+  copy:
+    src: '{{admin_irc_cert}}'
+    dest: /var/lib/irker.pem
+    owner: root
+    group: irker
+    mode: 0640
+
+- name: IRC robot options
+  when: master_node
+  template:
+    src: roles/squad/templates/irker
+    dest: /etc/default/irker
+    owner: root
+    group: irker
+    mode: 0640
+  register: irker_options
+
+- name: IRC robot config directory
+  when: master_node
+  file:
+    dest: /etc/systemd/system/irkerd.service.d
+    state: directory
+
+- name: configure IRC robot
+  template:
+    src: roles/squad/templates/irker-exec.conf
+    dest: /etc/systemd/system/irkerd.service.d/exec.conf
+    owner: root
+    group: root
+    mode: 0640
+  register: irkerd_conf
+  when: master_node
+
+- name: restart irkerd if needed
+  shell: 'systemctl daemon-reload && systemctl restart irkerd'
+  when: 'master_node and (irker_cert.changed or irker_options.changed or irkerd_conf.changed)'
+
+########################################################################
+### munin setup
+########################################################################
+
+- name: Install munin-node
+  apt:
+    pkg: munin-node
+    state: present
+    update-cache: yes
+
+- name: munin plugins for squad
+  register: munin_squad_plugins
+  copy:
+    src: munin/{{item}}
+    dest: /etc/munin/plugins/{{item}}
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - squad_processes
+    - squad_job_count
+    - squad_queue
+
+- name: configure munin plugins for squad
+  copy:
+    src: munin/plugins.conf
+    dest: /etc/munin/plugin-conf.d/squad
+    owner: root
+    group: root
+    mode: 0644
+  register: munin_squad_plugins_conf
+
+- name: configure munin-node
+  register: munin_node_conf
+  lineinfile:
+    dest: /etc/munin/munin-node.conf
+    line: "cidr_allow {{ hostvars[master_hostname].ansible_default_ipv4.address }}/32"
+
+- name: restart munin-node
+  when: munin_node_conf.changed or munin_squad_plugins.changed or munin_squad_plugins_conf.changed
+  command: systemctl restart munin-node
+
+- name: Install munin
+  when: master_node
+  apt:
+    pkg: munin
+    state: present
+    update-cache: yes
+
+- name: Configure munin
+  when: master_node
+  template:
+    src: roles/squad/templates/munin.conf
+    dest: /etc/munin/munin.conf
+  register: munin_conf
+
+- name: run munin on configurations changes
+  when: 'master_node and (munin_conf.changed or munin_squad_plugins.changed or munin_squad_plugins_conf.changed)'
+  command: runuser -u munin munin-cron

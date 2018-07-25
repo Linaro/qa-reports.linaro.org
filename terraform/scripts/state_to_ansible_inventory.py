@@ -40,7 +40,7 @@ print("[webservers]")
 master_hostname = None
 for host in inventory["webserver"]:
     if "www-0" in host['name']:
-        master_hostname = host['hostname'].split('.')[0] # get only local part
+        master_hostname = host['name']
         master = ' master_node=1'
     else:
         master = ''
@@ -58,4 +58,3 @@ print('master_hostname={}'.format(master_hostname))
 print("database_hostname={}".format(database['name']))
 print("ansible_user=ubuntu")
 print('ansible_ssh_common_args="-o StrictHostKeyChecking=no"')
-print('ansible_python_interpreter=/usr/bin/python3')

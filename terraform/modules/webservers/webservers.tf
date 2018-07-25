@@ -129,6 +129,14 @@ resource "aws_security_group" "qa-reports-ec2-www" {
     cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
   }
 
+  # munin
+  ingress {
+    from_port   = 4949
+    to_port     = 4949
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
+  }
+
   # outbound internet access
   egress {
     from_port   = 0
@@ -234,6 +242,14 @@ resource "aws_security_group" "qa-reports-ec2-worker" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # munin
+  ingress {
+    from_port   = 4949
+    to_port     = 4949
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
   }
 }
 output "qa-reports-ec2-worker-sg-id" { value = "${aws_security_group.qa-reports-ec2-worker.id}" }
