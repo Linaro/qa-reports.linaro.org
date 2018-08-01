@@ -59,3 +59,16 @@ just need to use the `upgrade` script instead of `deploy`:
 Doing an upgrade-only deployment is way faster then doing a full deployment,
 but should only be done when you are sure that the only change that is pending
 to the be applied to the system is an upgrade of squad.
+
+# SSH to the nodes
+
+Since the VM instances are disposable, we don't give them proper DNS names. To
+SSH into them, use the `ssh` script in this directory. Examples:
+
+```
+$ ./ssh production           # SSH to the production master node
+$ ./ssh staging              # SSH to the staging master node
+
+$ ./ssh production worker-0  # SSH to "worker-0" instance in production
+$ ./ssh staging www-1        # SSH to "www-1" "in staging
+```
