@@ -1,3 +1,12 @@
+- name: calculate worker concurrency
+  shell: 'echo $(($(nproc)*2))'
+  register: worker_concurrency_results
+  changed_when: False
+
+- name: worker concurrency
+  set_fact:
+    worker_concurrency: "{{worker_concurrency_results.stdout}}"
+
 - name: systemd service - worker
   template:
     src: roles/worker/templates/squad-worker.service
