@@ -10,11 +10,6 @@
 - command: systemctl enable squad-listener.service
   changed_when: False
 
-- command: systemctl restart squad-listener.service
-  name: restart squad-listener
-  when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
-  changed_when: False
-
 - name: systemd service - scheduler
   template:
     src: roles/master/templates/squad-scheduler.service
