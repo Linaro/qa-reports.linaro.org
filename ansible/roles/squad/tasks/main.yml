@@ -43,7 +43,7 @@
   register: install_squad_linaro_plugins
   changed_when: "'up-to-date: squad-linaro-plugins' not in install_squad_linaro_plugins.stdout"
 
-- name: install squad-ldap-opulate
+- name: install squad-ldap-populate
   template:
     src: roles/squad/templates/squad-ldap-populate
     dest: "{{install_base}}/bin/squad-ldap-populate"
