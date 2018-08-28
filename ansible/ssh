@@ -3,13 +3,16 @@
 set -eu
 
 if [ $# -lt 1 ]; then
-  echo "usage: $0 ENVIRONMENT [HOST]"
+  echo "usage: $0 ENVIRONMENT [HOST] [COMMAND ...]"
   exit 1
 fi
 
 env="$1"
 shift
 host="${1:-}"
+if [ -n "$host" ]; then
+  shift
+fi
 
 inventory=$(dirname $0)/hosts.$env
 
@@ -23,4 +26,4 @@ fi
 user=$(sed -e '/^ansible_user=/!d; s/ansible_user=//' "$inventory")
 ssh_args=$(sed -e '/^ansible_ssh_common_args=/!d; s/^ansible_ssh_common_args="\(.*\)"/\1/' "$inventory")
 
-exec ssh $ssh_args -l "$user" "$host"
+exec ssh $ssh_args -l "$user" "$host" "$@"
