@@ -55,7 +55,7 @@ resource "aws_db_parameter_group" "default" {
 }
 
 resource "aws_db_instance" "default" {
-    allocated_storage = 50
+    allocated_storage = 100
     storage_type = "gp2" # SSD
     apply_immediately = true
     engine = "postgres"
