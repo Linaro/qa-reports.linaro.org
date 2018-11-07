@@ -105,14 +105,20 @@
     mode: 0644
   register: munin_squad_plugins_conf
 
-- name: configure munin-node
-  register: munin_node_conf
+- name: configure munin-node hostname
+  register: munin_node_conf_hostname
+  lineinfile:
+    dest: /etc/munin/munin-node.conf
+    line: "host_name {{ inventory_hostname }}"
+
+- name: configure munin-node network access
+  register: munin_node_conf_cidr_allow
   lineinfile:
     dest: /etc/munin/munin-node.conf
     line: "cidr_allow {{ hostvars[master_hostname].ansible_default_ipv4.address }}/32"
 
 - name: restart munin-node
-  when: munin_node_conf.changed or munin_squad_plugins.changed or munin_squad_plugins_conf.changed
+  when: munin_node_conf_hostname.changed or munin_node_conf_cidr_allow.changed or munin_squad_plugins.changed or munin_squad_plugins_conf.changed
   command: systemctl restart munin-node
 
 - name: Install munin
