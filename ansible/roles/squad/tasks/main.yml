@@ -39,7 +39,9 @@
   changed_when: "'up-to-date: squad' not in install_squad.stdout"
 
 - name: Delete squad package, if any
-  command: 'rm -f {{install_base}}/{{squad}}'
+  file:
+    path: '{{install_base}}/{{squad}}'
+    state: absent
   when: '".whl" in squad'
 
 - name: install Linaro-specific SQUAD plugins
