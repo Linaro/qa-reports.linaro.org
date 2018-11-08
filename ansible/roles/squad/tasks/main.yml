@@ -38,6 +38,10 @@
   register: install_squad
   changed_when: "'up-to-date: squad' not in install_squad.stdout"
 
+- name: Delete squad package, if any
+  command: 'rm -f {{install_base}}/{{squad}}'
+  when: '".whl" in squad'
+
 - name: install Linaro-specific SQUAD plugins
   command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed squad-linaro-plugins"
   register: install_squad_linaro_plugins
