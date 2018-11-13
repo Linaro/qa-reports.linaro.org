@@ -2,8 +2,8 @@
 qa-reports-www-0 ansible_host=35.173.242.254 master_node=1
 qa-reports-www-1 ansible_host=34.224.70.97
 [workers]
-qa-reports-worker-0 ansible_host=54.208.54.110
-qa-reports-worker-1 ansible_host=34.229.164.246
+qa-reports-worker-0 ansible_host=34.227.109.22
+qa-reports-worker-1 ansible_host=100.26.36.176
 [production:children]
 webservers
 workers
