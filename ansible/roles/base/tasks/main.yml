@@ -42,6 +42,8 @@
   with_items:
     - build-essential
     - htop
+    - ncdu
+    - fail2ban
     - libldap2-dev
     - libpq-dev
     - libsasl2-dev
