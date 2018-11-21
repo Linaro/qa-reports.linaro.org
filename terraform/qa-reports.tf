@@ -22,6 +22,7 @@ variable "route53_zone_id" { type = "string" }
 variable "vpc_id" { type = "string" }
 variable "region" { type = "string" }
 variable "node_type" { type = "string" }
+variable "db_node_type" { type = "string" }
 variable "qa_reports_db_pass_production" {
   type = "string"
   # this will cause a failure at apply time if needed but not set
@@ -63,7 +64,7 @@ module "rds" {
   source = "modules/rds"
   environment = "${var.environment}"
   service_name = "${var.service_name}"
-  db_host_size = "${var.node_type}"
+  db_host_size = "${var.db_node_type}"
   availability_zone_to_subnet_map = "${var.availability_zone_to_subnet_map}"
   vpc_id = "${var.vpc_id}"
   instance_security_groups = ["${module.webservers.qa-reports-ec2-worker-sg-id}",
