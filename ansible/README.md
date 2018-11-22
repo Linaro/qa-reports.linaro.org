@@ -72,3 +72,7 @@ $ ./ssh staging              # SSH to the staging master node
 $ ./ssh production worker-0  # SSH to "worker-0" instance in production
 $ ./ssh staging www-1        # SSH to "www-1" "in staging
 ```
+
+# Loading production database dumps to staging
+
+Run `./howto-database-dump-restore.sh` and follow the instructions in the output.
