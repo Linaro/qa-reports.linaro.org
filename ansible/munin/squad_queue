@@ -23,14 +23,17 @@ if ! systemctl is-enabled --quiet squad-listener 2>/dev/null; then
     exit
 fi
 
+with_queues() {
+    rabbitmqctl list_queues | awk "/^(celery|reporting_queue)\s/ { $@ }"
+}
+
 if [ "$1" = "config" ]; then
     echo "graph_title Queue"
     echo 'graph_args --base 1000 -l 0'
     echo 'graph_vlabel Jobs'
     echo 'graph_category squad'
     echo 'graph_info Number of jobs in the queue'
-    echo 'queue.label Queue'
+    with_queues 'print($1 ".label", $1)'
 else
-    printf 'queue.value '
-    rabbitmqctl list_queues | awk '{if($1=="celery") {print($2)}}'
+    with_queues 'print($1 ".value", $2)'
 fi
