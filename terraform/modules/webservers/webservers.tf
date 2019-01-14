@@ -40,7 +40,36 @@ locals {
 resource "aws_acm_certificate" "acm-cert" {
   domain_name = "${var.canonical_dns_name}"
   subject_alternative_names = ["${local.local_dns_name}"]
-  validation_method = "EMAIL"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "cert_validation_a" {
+  name    = "${aws_acm_certificate.acm-cert.domain_validation_options.0.resource_record_name}"
+  type    = "${aws_acm_certificate.acm-cert.domain_validation_options.0.resource_record_type}"
+  zone_id = "${var.route53_zone_id}"
+  records = ["${aws_acm_certificate.acm-cert.domain_validation_options.0.resource_record_value}"]
+  ttl     = 60
+}
+
+resource "aws_route53_record" "cert_validation_cname" {
+  name    = "${aws_acm_certificate.acm-cert.domain_validation_options.1.resource_record_name}"
+  type    = "${aws_acm_certificate.acm-cert.domain_validation_options.1.resource_record_type}"
+  zone_id = "${var.route53_zone_id}"
+  records = ["${aws_acm_certificate.acm-cert.domain_validation_options.1.resource_record_value}"]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "default" {
+  certificate_arn = "${aws_acm_certificate.acm-cert.arn}"
+
+  validation_record_fqdns = [
+    "${aws_route53_record.cert_validation_a.fqdn}",
+    "${aws_route53_record.cert_validation_cname.fqdn}",
+  ]
 }
 
 # A security group for the load balancer so it is accessible via the web
