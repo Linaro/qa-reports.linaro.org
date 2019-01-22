@@ -1,9 +1,9 @@
 [webservers]
-staging-qa-reports-www-0 ansible_host=54.210.85.118 master_node=1
-staging-qa-reports-www-1 ansible_host=54.144.55.183
+staging-qa-reports-www-0 ansible_host=3.89.92.149 master_node=1
+staging-qa-reports-www-1 ansible_host=34.230.21.47
 [workers]
-staging-qa-reports-worker-0 ansible_host=54.234.49.181
-staging-qa-reports-worker-1 ansible_host=54.174.213.0
+staging-qa-reports-worker-0 ansible_host=34.226.121.243
+staging-qa-reports-worker-1 ansible_host=52.23.197.60
 [staging:children]
 webservers
 workers
