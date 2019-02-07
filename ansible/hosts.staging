@@ -13,3 +13,4 @@ master_hostname=staging-qa-reports-www-0
 database_hostname=terraform-20180223202455880900000001.cuuutnsao02n.us-east-1.rds.amazonaws.com
 ansible_user=ubuntu
 ansible_ssh_common_args="-o StrictHostKeyChecking=no"
+ansible_python_interpreter=/usr/bin/python3
