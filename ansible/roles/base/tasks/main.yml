@@ -6,7 +6,7 @@
 - name: "setup swap on boot"
   lineinfile:
     dest: /etc/fstab
-    line: "/swap  swap  sw  0 0"
+    line: "/swap  none swap  sw  0 0"
     state: present
 
 - name: SSH config directory
