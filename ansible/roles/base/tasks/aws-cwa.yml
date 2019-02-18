@@ -49,6 +49,12 @@
   when: cloudwatch_config.changed
   changed_when: False
 
+- name: Enable amazon-cloudwatch-agent
+  command: systemctl enable amazon-cloudwatch-agent
+
+- name: Start amazon-cloudwatch-agent
+  command: systemctl start amazon-cloudwatch-agent
+
 - name: Verify that amazon-cloudwatch-agent is actually running
   command: systemctl is-active --quiet amazon-cloudwatch-agent
   changed_when: False
