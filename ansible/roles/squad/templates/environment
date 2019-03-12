@@ -13,5 +13,5 @@ SQUAD_ADMINS='Antonio Terceiro <antonio.terceiro@linaro.org>, Milosz Wasilewski 
 ENV=production
 GUNICORN_CMD_ARGS="--workers 2"
 SQUAD_CELERY_BROKER_URL=amqp://{{master_hostname}}
-SQUAD_BASE_URL=https://{{servername}}
+SQUAD_BASE_URL=https://{{server_name}}
 SQUAD_HOSTNAME={{inventory_hostname}}
