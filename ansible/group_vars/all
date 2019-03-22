@@ -8,3 +8,4 @@ admin_email: root@localhost
 admin_irc:
 admin_irc_nick: qa-reports-bot
 admin_irc_cert:
+worker_concurrency_formula: 'echo $(($(nproc)*1))'

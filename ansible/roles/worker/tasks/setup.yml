@@ -1,5 +1,5 @@
 - name: calculate worker concurrency
-  shell: 'echo $(($(nproc)*1))'
+  shell: '{{worker_concurrency_formula}}'
   register: worker_concurrency_results
   changed_when: False
 
