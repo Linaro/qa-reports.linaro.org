@@ -55,6 +55,7 @@
     - htop
     - ncdu
     - fail2ban
+    - gettext
     - libldap2-dev
     - libpq-dev
     - libsasl2-dev
