@@ -57,6 +57,11 @@
     group: root
     mode: 0755
 
+- command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin compilemessages'
+  name: compile translations
+  when: 'install_squad.changed'
+  changed_when: False
+
 - command: sudo -u squad env -i bash -l -c '{{install_base}}/bin/squad-admin migrate'
   name: migrate database
   when: 'install_squad.changed and master_node'
