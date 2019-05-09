@@ -22,7 +22,7 @@
     - squad_queue
 
 - name: configure munin plugins for squad
-  copy:
+  template:
     src: munin/plugins.conf
     dest: /etc/munin/plugin-conf.d/squad
     owner: root
@@ -42,8 +42,54 @@
     dest: /etc/munin/munin-node.conf
     line: "cidr_allow {{ hostvars[master_hostname].ansible_default_ipv4.address }}/32"
 
+- name: install PostgreSQL plugin
+  when: master_node
+  register: munin_postres
+  file:
+    src: /usr/share/munin/plugins/{{ item.src }}
+    path: /etc/munin/plugins/{{ item.dst or item.src }}
+    state: link
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - src: postgres_autovacuum
+      dst: postgres_autovacuum
+    - src: postgres_bgwriter
+      dst: postgres_bgwriter
+    - src: postgres_checkpoints
+      dst: postgres_checkpoints
+    - src: postgres_connections_db
+      dst: postgres_connections_db
+    - src: postgres_users
+      dst: postgres_users
+    - src: postgres_xlog
+      dst: postgres_xlog
+    - src: postgres_connections_
+      dst: postgres_connections_{{ database_name }}
+    - src: postgres_cache_
+      dst: postgres_cache_{{ database_name }}
+    - src: postgres_locks_
+      dst: postgres_locks_{{ database_name }}
+    - src: postgres_oldest_prepared_xact_
+      dst: postgres_oldest_prepared_xact_{{ database_name }}
+    - src: postgres_prepared_xacts_
+      dst: postgres_prepared_xacts_{{ database_name }}
+    - src: postgres_querylength_
+      dst: postgres_querylength_{{ database_name }}
+    - src: postgres_scans_
+      dst: postgres_scans_{{ database_name }}
+    - src: postgres_size_
+      dst: postgres_size_{{ database_name }}
+    - src: postgres_streaming_
+      dst: postgres_streaming_{{ database_name }}
+    - src: postgres_transactions_
+      dst: postgres_transactions_{{ database_name }}
+    - src: postgres_tuples_
+      dst: postgres_tuples_{{ database_name }}
+
 - name: restart munin-node
-  when: munin_node_conf_hostname.changed or munin_node_conf_cidr_allow.changed or munin_squad_plugins.changed or munin_squad_plugins_conf.changed
+  when: munin_node_conf_hostname.changed or munin_node_conf_cidr_allow.changed or munin_squad_plugins.changed or munin_squad_plugins_conf.changed or munin_postres.changed
   command: systemctl restart munin-node
 
 - name: Install munin

@@ -55,6 +55,7 @@
     - htop
     - ncdu
     - fail2ban
+    - libdbd-pg-perl
     - libldap2-dev
     - libpq-dev
     - libsasl2-dev
