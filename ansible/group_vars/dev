@@ -5,6 +5,7 @@ database_hostname: qa-reports-master.local
 database_name: squad
 database_user: squad
 database_password: squad
+database_max_size: 3 # GB
 server_name: qa-reports-master.local
 server_alias: qa-reports-master-alias.local
 django_secret: 1234567890
