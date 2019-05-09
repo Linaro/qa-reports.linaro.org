@@ -33,11 +33,25 @@ variable "qa_reports_db_pass_staging" {
   # this will cause a failure at apply time if needed but not set
   default = false
 }
+variable "qa_reports_db_storage_production" {
+  type = "string"
+  # this will cause a failure at apply time if needed but not set
+  default = false
+}
+variable "qa_reports_db_storage_staging" {
+  type = "string"
+  # this will cause a failure at apply time if needed but not set
+  default = false
+}
 
 locals {
   rds_env_db_password = {
     production = "${var.qa_reports_db_pass_production}"
     staging = "${var.qa_reports_db_pass_staging}"
+  }
+  rds_env_db_storage = {
+    production = "${var.qa_reports_db_storage_production}"
+    staging = "${var.qa_reports_db_storage_staging}"
   }
 }
 
@@ -76,5 +90,7 @@ module "rds" {
   #   - Never want to set the password to some default or empty password
   # The 'false' default here will cause RDS to fail at apply time.
   rds_db_password = "${lookup(local.rds_env_db_password, var.environment, false)}"
+
+  rds_db_storage = "${lookup(local.rds_env_db_storage, var.environment, false)}"
 }
 
