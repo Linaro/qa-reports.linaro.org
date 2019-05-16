@@ -68,7 +68,6 @@
     - python-httplib2
     - python-psycopg2
     - python-virtualenv
-    - gettext
 
 - include_role:
     name: base
