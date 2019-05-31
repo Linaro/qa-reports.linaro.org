@@ -71,16 +71,6 @@
 
 - include_role:
     name: base
-    tasks_from: systemd_journal_remote_server.yml
-  when: 'upgrade_only is not defined and master_node'
-
-- include_role:
-    name: base
-    tasks_from: systemd_journal_remote_node.yml
-  when: 'upgrade_only is not defined and not master_node'
-
-- include_role:
-    name: base
     tasks_from: postfix.yml
   when: 'upgrade_only is not defined and ec2_smtp_server is defined'
 

@@ -17,12 +17,3 @@
   name: restart squad-listener
   when: squad_listener_service.changed or install_squad.changed or settings.changed or environmentfile.changed or linaro_ldap_backends.changed or install_squad_linaro_plugins.changed
   changed_when: False
-
-# It seems that journald/journalctl won't manage systemd-journal-remote's files.
-# Use a bigger hammer to keep size under control.
-- name: Remove old log files from /var/log/journal
-  cron:
-    name: Remove old log files from /var/log/journal
-    special_time: daily
-    job: /usr/bin/find /var/log/journal/ -type f -user systemd-journal-remote -mtime +14 -delete
-
