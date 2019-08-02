@@ -27,7 +27,7 @@ case "$@" in
         :
         ;;
     *)
-        if [ "$env" = "production" -o "$env" = "staging" ]; then
+        if [ "$env" = "production" -o "$env" = "staging" -o "$env" = "dev" ]; then
             use_vault="--vault-password-file=$basedir/vault-passwd"
         fi
         ;;
