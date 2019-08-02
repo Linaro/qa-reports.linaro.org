@@ -99,3 +99,27 @@
   template:
     src: roles/squad/templates/bash_profile
     dest: '{{install_base}}/.bash_profile'
+
+- name: .ssh
+  file:
+    state: directory
+    path: "{{install_base}}/.ssh"
+    owner: squad
+    group: squad
+    mode: 0700
+
+- name: private SSH key
+  copy:
+    src: secrets/id_rsa
+    dest: "{{install_base}}/.ssh/id_rsa"
+    owner: squad
+    group: squad
+    mode: 0600
+
+- name: public SSH key
+  copy:
+    src: roles/squad/templates/id_rsa.pub
+    dest: "{{install_base}}/.ssh/id_rsa.pub"
+    owner: squad
+    group: squad
+    mode: 0600
