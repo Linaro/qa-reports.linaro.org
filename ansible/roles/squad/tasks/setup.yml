@@ -47,6 +47,7 @@
     home: "{{install_base}}"
     createhome: no
     shell: /bin/bash
+    generate_ssh_key: "{{ 'yes' if ansible_user == 'vagrant' else 'no' }}"
 
 - name: Linaro LDAP settings file
   register: settings
@@ -109,6 +110,7 @@
     mode: 0700
 
 - name: private SSH key
+  when: ansible_user != "vagrant"
   copy:
     src: secrets/id_rsa
     dest: "{{install_base}}/.ssh/id_rsa"
@@ -117,6 +119,7 @@
     mode: 0600
 
 - name: public SSH key
+  when: ansible_user != "vagrant"
   copy:
     src: roles/squad/templates/id_rsa.pub
     dest: "{{install_base}}/.ssh/id_rsa.pub"
