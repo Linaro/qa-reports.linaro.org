@@ -27,7 +27,7 @@ variable "worker_instance_type" {
 }
 variable "worker_instance_count" {
   type = "string"
-  default = "2"
+  default = "3"
 }
 
 # Calculated variables

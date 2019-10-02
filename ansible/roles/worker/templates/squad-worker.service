@@ -7,7 +7,11 @@ User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
-ExecStart={{install_base}}/bin/celery -A squad worker --concurrency={{worker_concurrency}} -Q celery,reporting_queue --max-tasks-per-child=5000 --max-memory-per-child=1500000 --loglevel INFO
+{% if worker_type is defined and worker_type == 'quick' %}
+ExecStart={{install_base}}/bin/celery -A squad worker --concurrency={{worker_concurrency}} -Q core_reporting,core_postprocess,core_quick,core_notification,ci_quick,celery --max-tasks-per-child=5000 --max-memory-per-child=1500000 --loglevel INFO
+{% else %}
+ExecStart={{install_base}}/bin/celery -A squad worker --concurrency={{worker_concurrency}} -Q ci_poll,ci_fetch --max-tasks-per-child=5000 --max-memory-per-child=1500000 --loglevel INFO
+{% endif %}
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
 RestartSec=5

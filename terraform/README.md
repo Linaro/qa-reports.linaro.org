@@ -2,7 +2,9 @@
 
 This terraform repository stands up qa-reports.linaro.org's AWS infrastructure including:
 - webservers (2)
-- workers (2)
+- workers (3)
+  - 2 workers dedicated to 'fetch' operations
+  - 1 worker dedicated to all other operations
 - RDS database
 - load balancer
 - staging and production environments
