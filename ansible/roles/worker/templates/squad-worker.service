@@ -7,7 +7,7 @@ User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
-ExecStart={{install_base}}/bin/celery -A squad worker --concurrency={{worker_concurrency}} {% if worker_type is defined and worker_type == 'quick' %}--exclude-queues=ci_poll,ci_fetch{% endif %} --max-tasks-per-child=5000 --max-memory-per-child=1500000 --loglevel INFO
+ExecStart={{install_base}}/bin/squad-worker {% if worker_type is defined and worker_type == 'quick' %}--exclude-queues=ci_poll,ci_fetch{% endif %} --concurrency={{worker_concurrency}} 
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
 RestartSec=5
