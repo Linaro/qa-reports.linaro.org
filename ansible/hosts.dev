@@ -2,6 +2,7 @@
 qa-reports-master.local ansible_host=master master_node=1
 [workers]
 qa-reports-worker.local ansible_host=worker
+qa-reports-worker-quick.local ansible_host=worker-quick worker_type=quick
 [dev:children]
 webservers
 workers
