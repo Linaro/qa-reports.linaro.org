@@ -67,7 +67,7 @@ if [ "$1" = "config" ]; then
     define postfix Postfix
 else
     on_master printf "squad_listener.value "
-    on_master count 'squad-admin.listen'
+    on_master count 'squad.manage.listen$'
 
     on_master printf "squad_scheduler.value "
     on_master count 'celery -A squad beat'
