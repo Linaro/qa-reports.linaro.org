@@ -24,7 +24,9 @@ if ! systemctl is-enabled --quiet squad-listener 2>/dev/null; then
 fi
 
 with_queues() {
-    rabbitmqctl list_queues | awk "/^(celery|reporting_queue)\s/ { $@ }"
+    rabbitmqctl list_queues \
+        | grep -v 'celery@\|celeryev\|Listing queues' \
+        | awk "{ $@ }"
 }
 
 if [ "$1" = "config" ]; then
