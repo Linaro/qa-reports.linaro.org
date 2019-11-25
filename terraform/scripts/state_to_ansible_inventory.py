@@ -47,7 +47,11 @@ for host in inventory["webserver"]:
     print('{} ansible_host={}{}'.format(host['name'], host['ip'], master))
 print("[workers]")
 for host in inventory["worker"]:
-    print('{} ansible_host={}'.format(host['name'], host['ip']))
+    if "worker-0" in host['name']:
+        worker_quick = ' worker_type=quick'
+    else:
+        worker_quick = ''
+    print('{} ansible_host={}{}'.format(host['name'], host['ip'], worker_quick))
 print("[{}:children]".format(environment))
 print("webservers")
 print("workers")
