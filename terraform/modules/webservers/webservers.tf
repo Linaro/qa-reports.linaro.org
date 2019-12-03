@@ -11,6 +11,7 @@ variable "route53_zone_id" { type = "string" }
 variable "route53_base_domain_name" { type = "string" }
 variable "canonical_dns_name" { type = "string" }
 variable "service_name" { type = "string" }
+variable "instance_profile" { type = "string" }
 
 # Optional variables
 variable "www_instance_type" {
@@ -215,7 +216,7 @@ resource "aws_instance" "qa-reports-www" {
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
   user_data = "${file("scripts/provision.sh")}"
-  iam_instance_profile = "qa_reports_instance_profile"
+  iam_instance_profile = "${var.instance_profile}"
 
   tags {
     Name = "${var.service_name}-www-${count.index}"
@@ -273,7 +274,7 @@ resource "aws_instance" "qa-reports-worker" {
 
   # Initial host provisioning.
   user_data = "${file("scripts/provision.sh")}"
-  iam_instance_profile = "qa_reports_instance_profile"
+  iam_instance_profile = "${var.instance_profile}"
 
   tags {
     Name = "${var.service_name}-worker-${count.index}"

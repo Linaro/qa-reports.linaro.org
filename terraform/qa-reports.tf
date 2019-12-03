@@ -59,6 +59,48 @@ provider "aws" {
   region = "${var.region}"
 }
 
+# Create an instance profile per environment (terraform workspaces used for environments)
+resource "aws_iam_instance_profile" "qa_reports_instance_profile" {
+  name = "${var.environment}_qa_reports_instance_profile"
+  role = "${aws_iam_role.qa_reports_role.name}"
+}
+
+# Create an iam role per environment which is accessible from ec2
+resource "aws_iam_role" "qa_reports_role" {
+  name = "${var.environment}_qa_reports_instance_iam_role"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:PutMetricData",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeTags",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups",
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"
+        }
+    ]
+}
+EOF
+}
+
+
 module "webservers" {
   source = "modules/webservers"
   environment = "${var.environment}"
@@ -72,6 +114,7 @@ module "webservers" {
   route53_base_domain_name = "${var.route53_base_domain_name}"
   canonical_dns_name = "${var.canonical_dns_name}"
   service_name = "${var.service_name}"
+  instance_profile = "${aws_iam_instance_profile.qa_reports_instance_profile.name}"
 }
 
 module "rds" {
