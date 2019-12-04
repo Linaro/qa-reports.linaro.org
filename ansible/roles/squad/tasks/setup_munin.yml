@@ -10,16 +10,17 @@
 
 - name: munin plugins for squad
   register: munin_squad_plugins
-  copy:
-    src: munin/{{item}}
-    dest: /etc/munin/plugins/{{item}}
-    owner: root
-    group: root
-    mode: 0755
+  template:
+      src: munin/{{item}}
+      dest: /etc/munin/plugins/{{item}}
+      owner: root
+      group: root
+      mode: 0755
   with_items:
     - squad_processes
     - squad_job_count
     - squad_queue
+    - list_sqs_queues.py
 
 - name: configure munin plugins for squad
   template:

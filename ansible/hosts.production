@@ -9,6 +9,7 @@ qa-reports-worker-2 ansible_host=54.173.74.91
 webservers
 workers
 [production:vars]
+env=production
 master_node=0
 master_hostname=qa-reports-www-0
 database_hostname=terraform-20180420145948581500000001.cuuutnsao02n.us-east-1.rds.amazonaws.com

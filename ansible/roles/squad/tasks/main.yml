@@ -13,6 +13,11 @@
   when: upgrade_only is not defined
 
 - include_role:
+    name: base
+    tasks_from: sqs.yml
+  when: upgrade_only is not defined and not use_rabbitmq
+
+- include_role:
     name: squad
     tasks_from: setup_munin.yml
   when: upgrade_only is not defined

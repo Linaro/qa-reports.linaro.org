@@ -1,0 +1,9 @@
+- name: Install packages needed for SQS
+  apt: pkg={{item}} state=present update-cache=yes
+  with_items:
+    - libcurl4-openssl-dev
+
+- name: Install dependencies for Squad to work with SQS
+  command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed celery[sqs]"
+  register: install_celery_sqs
+  changed_when: "'up-to-date: celery' not in install_celery_sqs.stdout"

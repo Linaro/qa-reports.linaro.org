@@ -76,6 +76,27 @@ resource "aws_iam_role" "qa_reports_role" {
     "Statement": [
         {
             "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "qa_reports_role_policy" {
+  name = "${var.environment}_qa_reports_role_policy"
+  role = "${aws_iam_role.qa_reports_role.name}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
             "Action": [
                 "cloudwatch:PutMetricData",
                 "ec2:DescribeVolumes",
@@ -100,6 +121,12 @@ resource "aws_iam_role" "qa_reports_role" {
 EOF
 }
 
+module "sqs" {
+  source = "modules/sqs"
+  environment = "${var.environment}"
+  role = "${aws_iam_role.qa_reports_role.name}"
+  region = "${var.region}"
+}
 
 module "webservers" {
   source = "modules/webservers"

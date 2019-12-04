@@ -57,6 +57,7 @@ print("webservers")
 print("workers")
 
 print("[{}:vars]".format(environment))
+print('env={}'.format(environment))
 print('master_node=0')
 print('master_hostname={}'.format(master_hostname))
 print("database_hostname={}".format(database['name']))

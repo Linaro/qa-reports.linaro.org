@@ -10,10 +10,14 @@ SQUAD_SITE_NAME="{{site_name}}"
 SQUAD_LOG_LEVEL=DEBUG
 SQUAD_EMAIL_FROM=qa-reports@linaro.org
 SQUAD_ADMINS='Antonio Terceiro <antonio.terceiro@linaro.org>, Milosz Wasilewski <milosz.wasilewski@linaro.org>, Charles Oliveira <charles.oliveira@linaro.org>'
-ENV=production
+ENV={{env}}
 GUNICORN_CMD_ARGS="--workers 2"
 {% if use_rabbitmq %}
 SQUAD_CELERY_BROKER_URL=amqp://{{master_hostname}}
+{% else %}
+SQUAD_CELERY_BROKER_URL=sqs://
+SQUAD_CELERY_QUEUE_NAME_PREFIX={{env}}_
+SQUAD_CELERY_POLL_INTERVAL=60
 {% endif %}
 SQUAD_BASE_URL=https://{{server_name}}
 SQUAD_HOSTNAME={{inventory_hostname}}
