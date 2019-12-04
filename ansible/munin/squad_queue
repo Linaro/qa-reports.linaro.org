@@ -18,6 +18,10 @@
 #
 # Plugin to monitor the SQUAD job queue
 
+{% if not use_rabbitmq %}
+exit
+{% endif %}
+
 # for master node only
 if ! systemctl is-enabled --quiet squad-listener 2>/dev/null; then
     exit

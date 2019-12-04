@@ -6,3 +6,4 @@ setup_cloudwatch: false
 email_from: root@localhost
 admin_email: root@localhost
 worker_concurrency_formula: 'echo $(($(nproc)*1))'
+use_rabbitmq: false

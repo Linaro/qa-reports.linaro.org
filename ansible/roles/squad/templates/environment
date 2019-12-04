@@ -12,6 +12,8 @@ SQUAD_EMAIL_FROM=qa-reports@linaro.org
 SQUAD_ADMINS='Antonio Terceiro <antonio.terceiro@linaro.org>, Milosz Wasilewski <milosz.wasilewski@linaro.org>, Charles Oliveira <charles.oliveira@linaro.org>'
 ENV=production
 GUNICORN_CMD_ARGS="--workers 2"
+{% if use_rabbitmq %}
 SQUAD_CELERY_BROKER_URL=amqp://{{master_hostname}}
+{% endif %}
 SQUAD_BASE_URL=https://{{server_name}}
 SQUAD_HOSTNAME={{inventory_hostname}}

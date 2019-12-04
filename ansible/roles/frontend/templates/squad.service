@@ -1,6 +1,6 @@
 [Unit]
 Description=SQUAD: software quality dashboard
-After=postgresql.service rabbitmq-server.service
+After=postgresql.service{% if use_rabbitmq %} rabbitmq-server.service{% endif %}
 
 [Service]
 User=squad

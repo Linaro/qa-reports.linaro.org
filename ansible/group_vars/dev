@@ -1,6 +1,7 @@
 site_name: "Linaro QA DEV"
 linaro_ldap: false
 database_is_local: true
+use_rabbitmq: true
 database_hostname: qa-reports-master.local
 database_name: squad
 database_user: squad

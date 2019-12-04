@@ -81,7 +81,6 @@ Alarm dashboard to determine why the data is not available.
 
 There are two services that cause us-east-1a availability zone to be a point of failure for us:
 - RDS is deployed to us-east-1a and multi-AZ replication is not enabled (cost will roughly double to enable it)
-- RabbitMQ runs on the webserver in us-east-1a, and is a single point of failure.
 
 ## State
 
