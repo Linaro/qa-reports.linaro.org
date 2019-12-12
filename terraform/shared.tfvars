@@ -11,4 +11,4 @@ route53_base_domain_name = "ctt.linaro.org"
 # us-east-1, 16.04LTS, hvm:ebs-ssd
 # see https://cloud-images.ubuntu.com/locator/ec2/
 ami_id = "ami-0b383171"
-
+db_max_allocated_storage = 500

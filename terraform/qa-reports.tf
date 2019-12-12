@@ -23,6 +23,7 @@ variable "vpc_id" { type = "string" }
 variable "region" { type = "string" }
 variable "node_type" { type = "string" }
 variable "db_node_type" { type = "string" }
+variable "db_max_allocated_storage" { type = "string" }
 variable "qa_reports_db_pass_production" {
   type = "string"
   # this will cause a failure at apply time if needed but not set
@@ -162,5 +163,6 @@ module "rds" {
   rds_db_password = "${lookup(local.rds_env_db_password, var.environment, false)}"
 
   rds_db_storage = "${lookup(local.rds_env_db_storage, var.environment, false)}"
+  rds_db_max_storage = "${var.db_max_allocated_storage}"
 }
 
