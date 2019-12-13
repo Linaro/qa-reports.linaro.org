@@ -33,5 +33,5 @@ if [ "$1" = "config" ]; then
     echo 'jobs.draw AREASTACK'
 else
     printf 'jobs.value '
-    journalctl --unit squad-worker.service --no-pager --since '5m ago' | grep -c Task.*succeeded
+    journalctl --unit squad-worker.service --no-pager --since '5m ago' | grep -c Task.*succeeded || true
 fi
