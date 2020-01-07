@@ -11,6 +11,7 @@ variable "route53_zone_id" { type = "string" }
 variable "route53_base_domain_name" { type = "string" }
 variable "canonical_dns_name" { type = "string" }
 variable "service_name" { type = "string" }
+variable "instance_profile" { type = "string" }
 
 # Optional variables
 variable "www_instance_type" {
@@ -40,7 +41,7 @@ locals {
 resource "aws_acm_certificate" "acm-cert" {
   domain_name = "${var.canonical_dns_name}"
   subject_alternative_names = ["${local.local_dns_name}"]
-  validation_method = "EMAIL"
+  validation_method = "NONE"
 }
 
 # A security group for the load balancer so it is accessible via the web
@@ -96,27 +97,6 @@ resource "aws_security_group" "qa-reports-ec2-www" {
   ingress {
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
-  }
-
-  # RabbitMQ clustering traffic inside local network
-  # source: https://www.rabbitmq.com/networking.html
-  ingress {
-    from_port   = 4369
-    to_port     = 4369
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
-  }
-  ingress {
-    from_port   = 5671
-    to_port     = 5672
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
-  }
-  ingress {
-    from_port   = 25672
-    to_port     = 25672
     protocol    = "tcp"
     cidr_blocks = ["${data.aws_subnet.oursubnets.*.cidr_block}"]
   }
@@ -215,7 +195,7 @@ resource "aws_instance" "qa-reports-www" {
   availability_zone = "${element(keys(var.availability_zone_to_subnet_map), count.index)}"
 
   user_data = "${file("scripts/provision.sh")}"
-  iam_instance_profile = "qa_reports_instance_profile"
+  iam_instance_profile = "${var.instance_profile}"
 
   tags {
     Name = "${var.service_name}-www-${count.index}"
@@ -273,7 +253,7 @@ resource "aws_instance" "qa-reports-worker" {
 
   # Initial host provisioning.
   user_data = "${file("scripts/provision.sh")}"
-  iam_instance_profile = "qa_reports_instance_profile"
+  iam_instance_profile = "${var.instance_profile}"
 
   tags {
     Name = "${var.service_name}-worker-${count.index}"

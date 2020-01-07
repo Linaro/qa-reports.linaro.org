@@ -1,16 +1,3 @@
-- name: Install message broker packages
-  apt: pkg={{item}} state=present update-cache=yes
-  when: master_node
-  with_items:
-    - rabbitmq-server
-
-- name: RabbitMQ config
-  when: master_node
-  template:
-    src: roles/squad/templates/rabbitmq.config
-    dest: /etc/rabbitmq/rabbitmq.config
-  notify: restart-rabbitmq
-
 - meta: flush_handlers
 
 - name: create virtualenv

@@ -1,14 +1,15 @@
 [webservers]
-qa-reports-www-0 ansible_host=35.173.242.254 master_node=1
-qa-reports-www-1 ansible_host=34.224.70.97
+qa-reports-www-0 ansible_host=54.209.85.153 master_node=1
+qa-reports-www-1 ansible_host=54.146.248.64
 [workers]
-qa-reports-worker-0 ansible_host=18.212.9.17 worker_type=quick
-qa-reports-worker-1 ansible_host=3.82.25.12
-qa-reports-worker-2 ansible_host=54.173.74.91
+qa-reports-worker-0 ansible_host=3.92.255.26 worker_type=quick
+qa-reports-worker-1 ansible_host=34.207.112.152
+qa-reports-worker-2 ansible_host=54.92.214.77
 [production:children]
 webservers
 workers
 [production:vars]
+env=production
 master_node=0
 master_hostname=qa-reports-www-0
 database_hostname=terraform-20180420145948581500000001.cuuutnsao02n.us-east-1.rds.amazonaws.com

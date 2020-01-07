@@ -1,8 +1,16 @@
-- name: Install PostgreSQL
+- name: Install PostgreSQL and RabbitMQ
   apt: pkg={{item}} state=present update-cache=yes
   when: master_node
   with_items:
     - postgresql
+    - rabbitmq-server
+
+- name: RabbitMQ config
+  when: master_node
+  template:
+    src: roles/squad/templates/rabbitmq.config
+    dest: /etc/rabbitmq/rabbitmq.config
+  notify: restart-rabbitmq
 
 - name: get PostgreSQL config file
   shell: 'find /etc/postgresql -name postgresql.conf | head -1'

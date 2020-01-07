@@ -24,7 +24,11 @@ if ! systemctl is-enabled --quiet squad-listener 2>/dev/null; then
 fi
 
 with_queues() {
+    {% if use_rabbitmq %}
     rabbitmqctl list_queues \
+    {% else %}
+    /etc/munin/plugins/list_sqs_queues.py \
+    {% endif %}
         | grep -v 'celery@\|celeryev\|Listing queues' \
         | awk "{ $@ }"
 }

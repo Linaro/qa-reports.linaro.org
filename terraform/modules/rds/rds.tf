@@ -3,6 +3,7 @@ variable "service_name" { type = "string" }
 variable "db_host_size" { type = "string" }
 variable "rds_db_password" { type = "string" }
 variable "rds_db_storage" { type = "string" }
+variable "rds_db_max_storage" { type = "string" }
 variable "availability_zone_to_subnet_map" { type = "map" }
 variable "vpc_id" { type = "string" }
 variable "instance_security_groups" {
@@ -57,6 +58,7 @@ resource "aws_db_parameter_group" "default" {
 
 resource "aws_db_instance" "default" {
     allocated_storage = "${var.rds_db_storage}"
+    max_allocated_storage = "${var.rds_db_max_storage}"
     storage_type = "gp2" # SSD
     apply_immediately = true
     engine = "postgres"

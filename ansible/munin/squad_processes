@@ -62,7 +62,9 @@ if [ "$1" = "config" ]; then
 
     on_worker define squad_worker "SQUAD worker"
 
+    {% if use_rabbitmq %}
     on_master define rabbitmq "RabbitMQ"
+    {% endif %}
 
     define postfix Postfix
 else
@@ -78,8 +80,10 @@ else
     on_worker printf "squad_worker.value "
     on_worker count 'celery -A squad worker'
 
+    {% if use_rabbitmq %}
     on_master printf "rabbitmq.value "
     on_master count erlang.*rabbitmq
+    {% endif %}
 
     printf "postfix.value "
     count postfix/.*/master

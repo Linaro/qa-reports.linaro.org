@@ -7,6 +7,7 @@ qa-reports-worker-quick.local ansible_host=worker-quick worker_type=quick
 webservers
 workers
 [dev:vars]
+env=dev
 master_node=0
 master_hostname=qa-reports-master.local
 database_hostname=qa-reports-master.local
