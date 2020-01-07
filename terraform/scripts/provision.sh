@@ -12,6 +12,9 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4XbnFOoWpbwEiX0k6YsJQteanZft5E8IuzZ
 # mwasilew's ssh key
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLg0a071B8RSBVYxXoGa/dMZ7jaiLdEM8tmMIg0VTFAh8xPOUIJ8HWurQdc+mq6mMtBFqKGJ5YshLEXK//CKRW+lR+2eTEpjMLfoOR7u1zxU35+lAxbVavOwEHzjaPaGypmaqwWvNdlgsg2gl5Qo7B2f9nEnHtieAW7qI/1agjorB8/I12H2H2iC7GWKptRq1wPRp2sgwq2Bk286xTOESFV+iv0tzT5GepJUexXmF69xqlkW5uznA7LV8DqPQk/5n42K8i5gMjH+ulEDTc1/aMVjjTaSIEbEsvyvhXCXa7PpCRdXT/vodKHnRUwJPu5lkX5m9WSpl6E0RdqQY/3WTn mwasilew" >> /home/ubuntu/.ssh/authorized_keys
 
+# chaws's ssh key
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLVhmQdvjaGl4vwKAi4Nq8tAcLpBy1DnGtJR57QdeZCp6t3pL8T+1e/uA/GSxgjLkj2wbsRV7/Q6CVq16/P0LA85LHAsDw2395QaoplcupZkOgZwsv+zSpX60bZjuxpzbaLSJK6xy0H6K4IulANd6olS6jV49XYsx0xIDVih7sfW4zoEOmVPMuxtpOresK0/30J0QeClvtfZgX6V6DNb5ZmpcKmv0Pxn6PmHqexK6o8TkaMDg0kh0cL6gzqhuq+deGnphEoUGuzXA1rv1ZJKtOS8Bxg0IKg5V6ugTmfHoWKhC+4zD2FWqmOdHx5WSoE5VIitgG5yF0TcSAddLKSjTv chaws" >> /home/ubuntu/.ssh/authorized_keys
+
 retry() {
     n=1
     while [ "$n" -le 10 ] && ! "$@"; do
