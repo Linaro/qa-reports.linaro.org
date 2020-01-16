@@ -4,6 +4,8 @@ variable "role" { type = "string" }
 
 variable "region" { type = "string" }
 
+variable "visibility_timeout" { type = "string" }
+
 variable "queue_names" {
   description = "Squad queues"
   type        = "list"
@@ -13,6 +15,7 @@ variable "queue_names" {
 resource "aws_sqs_queue" "qa_reports_queue" {
   count = "${length(var.queue_names)}"
   name  = "${var.environment}_${var.queue_names[count.index]}"
+  visibility_timeout_seconds = "${var.visibility_timeout}"
 }
 
 # Create an IAM policy and attach it to the environment role

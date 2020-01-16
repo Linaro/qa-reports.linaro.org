@@ -24,6 +24,7 @@ variable "region" { type = "string" }
 variable "node_type" { type = "string" }
 variable "db_node_type" { type = "string" }
 variable "db_max_allocated_storage" { type = "string" }
+variable "sqs_visibility_timeout" { type = "string" }
 variable "qa_reports_db_pass_production" {
   type = "string"
   # this will cause a failure at apply time if needed but not set
@@ -127,6 +128,7 @@ module "sqs" {
   environment = "${var.environment}"
   role = "${aws_iam_role.qa_reports_role.name}"
   region = "${var.region}"
+  visibility_timeout = "${var.sqs_visibility_timeout}"
 }
 
 module "webservers" {

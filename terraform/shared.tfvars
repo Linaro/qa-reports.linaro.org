@@ -12,3 +12,7 @@ route53_base_domain_name = "ctt.linaro.org"
 # see https://cloud-images.ubuntu.com/locator/ec2/
 ami_id = "ami-0b383171"
 db_max_allocated_storage = 500
+
+# SQS visibility timeout in seconds
+# see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+sqs_visibility_timeout = 3600
