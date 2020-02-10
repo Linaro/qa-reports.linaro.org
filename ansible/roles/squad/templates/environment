@@ -17,6 +17,7 @@ SQUAD_CELERY_BROKER_URL=amqp://{{master_hostname}}
 {% else %}
 SQUAD_CELERY_BROKER_URL=sqs://
 SQUAD_CELERY_QUEUE_NAME_PREFIX={{env}}_
+SQUAD_CELERY_QUEUE_NAME_SUFFIX=.fifo
 SQUAD_CELERY_POLL_INTERVAL=60
 {% endif %}
 SQUAD_BASE_URL=https://{{server_name}}
