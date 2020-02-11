@@ -14,8 +14,9 @@ variable "queue_names" {
 
 resource "aws_sqs_queue" "qa_reports_queue" {
   count = "${length(var.queue_names)}"
-  name  = "${var.environment}_${var.queue_names[count.index]}"
+  name  = "${var.environment}_${var.queue_names[count.index]}.fifo"
   visibility_timeout_seconds = "${var.visibility_timeout}"
+  fifo_queue = "true"
 }
 
 # Create an IAM policy and attach it to the environment role
