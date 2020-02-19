@@ -7,7 +7,8 @@ User=squad
 Group=squad
 PrivateTmp=yes
 WorkingDirectory={{install_base}}
-ExecStart={{install_base}}/bin/squad-worker {% if worker_type is defined and worker_type == 'quick' %}--exclude-queues=ci_poll,ci_fetch{% endif %} --concurrency={{worker_concurrency}} 
+{% set exclude_queues = 'ci_poll,ci_fetch' if use_rabbitmq else 'ci_poll.fifo,ci_fetch.fifo' %}
+ExecStart={{install_base}}/bin/squad-worker {% if worker_type is defined and worker_type == 'quick' %}--exclude-queues={{ exclude_queues }}{% endif %} --concurrency={{worker_concurrency}}
 EnvironmentFile={{install_base}}/environment
 Restart=on-failure
 RestartSec=5

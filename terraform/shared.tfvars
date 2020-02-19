@@ -15,4 +15,4 @@ db_max_allocated_storage = 500
 
 # SQS visibility timeout in seconds
 # see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
-sqs_visibility_timeout = 3600
+sqs_visibility_timeout = 600
