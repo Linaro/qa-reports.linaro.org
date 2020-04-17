@@ -7,6 +7,10 @@
   changed_when: false
 
 - assert: { that: "true" }
+  register: install_sentry
+  changed_when: false
+
+- assert: { that: "true" }
   register: linaro_ldap_backends
   changed_when: false
 

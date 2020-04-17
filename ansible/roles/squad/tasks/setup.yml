@@ -24,6 +24,14 @@
   register: install_psycopg2
   changed_when: "'up-to-date: psycopg2' not in install_psycopg2.stdout"
 
+- name: install sentry
+  when: sentry_dsn is defined
+  command: "{{install_base}}/bin/pip install --upgrade 'sentry-sdk==0.14.3'"
+  args:
+    chdir: '{{install_base}}'
+  register: install_sentry
+  changed_when: "'up-to-date: sentry-sdk' not in install_sentry.stdout"
+
 - name: install Django ldap auth module
   command: "{{install_base}}/bin/pip install --upgrade --upgrade-strategy=only-if-needed django-auth-ldap"
   register: install_django_ldap
