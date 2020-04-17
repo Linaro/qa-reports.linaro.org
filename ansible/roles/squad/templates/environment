@@ -22,3 +22,6 @@ SQUAD_CELERY_POLL_INTERVAL=60
 {% endif %}
 SQUAD_BASE_URL=https://{{server_name}}
 SQUAD_HOSTNAME={{inventory_hostname}}
+{% if sentry_dsn is defined %}
+SENTRY_DSN={{sentry_dsn}}
+{% endif %}
