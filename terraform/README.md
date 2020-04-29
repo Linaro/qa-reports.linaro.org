@@ -18,18 +18,22 @@ role.
 
 ## Prerequisites
 
+In order to authenticate to AWS Single-Sign-On one need to have aws cli v2
+(https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html)
+and have SSO configured properly (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html).
+
+After SSO is set up, the `aws2-wrap` tool needs to export credentials
+that terraform use to manage resources. For details see: https://github.com/linaro-its/aws2-wrap
+
 You must create a file called `auth.conf` in the same directory as this README,
 with the following contents:
 
 ```
 aws_profile=xxxxxxxxxx
-aws_mfa_serial=arn:aws:iam::xxxxxxxxxxxxxx:mfa/first.last
 ```
 
-`aws_profile` is the name of a profile in your local aws credentials, i.e.
-`~/.aws/config` and `~/.aws/credentials`.
-
-`aws_mfa_serial` serial is the serial number of your MFA device.
+`aws_profile` is the name of a profile that you configured during SSO set up and it's
+located at `~/.aws/config` and `~/.aws/credentials`.
 
 ## Deploy
 

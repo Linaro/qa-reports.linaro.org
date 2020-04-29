@@ -9,14 +9,13 @@ conf=$(dirname $0)/auth.conf
 if [ -r "$conf" ]; then
     . "$conf"
 fi
-if [ -z "${aws_profile:-}" ] || [ -z "${aws_mfa_serial:-}" ]; then
-    echo "E: Both \$aws_profile and \$aws_mfa_serial must be set."
-    echo "I: Either set them in the environment, or in $conf"
+if [ -z "${aws_profile:-}" ]; then
+    echo "E: \$aws_profile must be set."
+    echo "I: Either set it in the environment, or in $conf"
     exit 1
 fi
 
 # data
-role=arn:aws:iam::495570029050:role/qa-admin
 duration=3600
 
 # assume the qa-admin role
@@ -28,30 +27,18 @@ chmod 700 "$credentials_dir"
 if [ -e "$credentials" ]; then
     now=$(date +%s)
     credentials_created=$(stat --format=%Y "$credentials")
-    if [ $((now - credentials_created)) -gt 3600 ]; then
+    if [ $((now - credentials_created)) -gt $duration ]; then
         rm -f "$credentials"
     fi
 fi
 if [ ! -e "$credentials" ] || [ ! -s "$credentials" ]; then
-    read -p "MFA token: " token
     touch "$credentials"
     chmod 600 "$credentials"
-    aws --profile "$aws_profile" \
-        --region us-east-1 \
-        sts assume-role \
-        --role-arn "$role"  \
-        --role-session-name "`whoami`" \
-        --duration-seconds "$duration" \
-        --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-        --serial-number "$aws_mfa_serial" \
-        --token-code "$token" \
-        --output text \
-        >> "$credentials"
+    aws2-wrap --profile "$aws_profile" --export >> "$credentials"
 fi
 
-export AWS_ACCESS_KEY_ID="$(awk '{print($1)}' "$credentials")"
-export AWS_SECRET_ACCESS_KEY="$(awk '{print($2)}' "$credentials")"
-export AWS_SESSION_TOKEN="$(awk '{print($3)}' "$credentials")"
+# export AWS{ACCESS_KEY_ID,SECRET_ACCESS_KEY,SESSION_TOKEN}
+. $credentials
 
 # environment
 ./scripts/set_env.sh "$ENV"
