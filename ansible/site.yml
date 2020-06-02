@@ -11,6 +11,8 @@
       service:
         name: "amazon-cloudwatch-agent"
         state: "restarted"
+    - name: docker status
+      service: name=docker state=started
 
 
 - name: Configure frontends

@@ -72,7 +72,7 @@
 - include_role:
     name: base
     tasks_from: postfix.yml
-  when: 'upgrade_only is not defined and ec2_smtp_server is defined'
+  when: 'upgrade_only is not defined'
 
 # Install AWS SSM
 # This is included by default as of Ubuntu 18.04 in AWS (so only install

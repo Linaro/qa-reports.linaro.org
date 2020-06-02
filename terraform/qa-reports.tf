@@ -107,7 +107,8 @@ resource "aws_iam_role_policy" "qa_reports_role_policy" {
                 "logs:DescribeLogStreams",
                 "logs:DescribeLogGroups",
                 "logs:CreateLogStream",
-                "logs:CreateLogGroup"
+                "logs:CreateLogGroup",
+                "ses:SendRawEmail"
             ],
             "Resource": "*"
         },
