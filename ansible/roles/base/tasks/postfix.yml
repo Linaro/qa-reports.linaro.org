@@ -1,41 +1,62 @@
-- name: sasl_passwd
-  register: sasl_passwd
-  template:
-    src: roles/base/templates/sasl_passwd
-    dest: /etc/postfix/sasl_passwd
+# We'll be using an aws-smtp-relay container to access AWS SES services
+# https://collaborate.linaro.org/display/ITS/Using+SES+with+IAM+role
+- name: Prepare for docker install
+  apt: pkg={{item}} state=present update-cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - software-properties-common
+    - gnupg-agent
 
-- name: hash sasl_passwd
-  shell: postmap /etc/postfix/sasl_passwd
-  when: sasl_passwd.changed
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
 
-- name: tls_policy
-  register: tls_policy
-  template:
-    src: roles/base/templates/tls_policy
-    dest: /etc/postfix/tls_policy
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu xenial stable
+    state: present
 
-- name: hash tls_policy
-  shell: postmap /etc/postfix/tls_policy
-  when: tls_policy.changed
+- name: Update apt and install docker-ce
+  apt: update-cache=yes pkg={{item}} state=present
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - python3-docker
+  notify:
+    - docker status
 
-- name: config postfix
+- name: Create aws-smtp-relay container
+  docker_container:
+    name: "aws_smtp_relay_container"
+    image: "blueimp/aws-smtp-relay"
+    hostname: "{{inventory_hostname}}"
+    state: started
+    ports:
+      - 1025:1025
+    env:
+      AWS_REGION: "us-east-1"
+
+- name: Disable postfix tls and sasl
   register: postconf
   lineinfile:
-    dest: /etc/postfix/main.cf
-    line: '{{item}}'
+    path: /etc/postfix/main.cf
+    state: absent
+    regexp: '^{{item}}'
   with_items:
-    - 'relayhost = {{ec2_smtp_server}}'
-    - 'smtp_sasl_auth_enable = yes'
-    - 'smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd'
-    - 'smtp_sasl_security_options = noanonymous'
-    - 'smtp_tls_policy_maps = hash:/etc/postfix/tls_policy'
+    - 'smtp_sasl_auth_enable'
+    - 'smtp_sasl_password_maps'
+    - 'smtp_sasl_security_options'
+    - 'smtp_tls_policy_maps'
 
-- name: reset postfix relayhost
+- name: Configure postfix to use local stmp relay
   register: reset_relayhost
   lineinfile:
-    state: absent
-    line: 'relayhost = '
-    dest: /etc/postfix/main.cf
+    path: /etc/postfix/main.cf
+    regexp: '^relayhost'
+    line: 'relayhost = localhost:1025'
 
 - name: reload postfix
   shell: systemctl reload postfix
