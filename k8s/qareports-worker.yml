@@ -1,0 +1,97 @@
+#
+# Autoscale pods to have minumum of 2 pods up to 10 pods
+# depending on CPU average load
+#
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: qareports-worker-autoscale
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: qareports-worker-deployment
+
+---
+
+#
+# Deploy initially one pod of qareports container as worker
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qareports-worker-deployment
+  labels:
+    app: qareports-worker
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qareports-worker
+
+  template:
+    metadata:
+      labels:
+        app: qareports-worker
+
+    spec:
+      volumes:
+      - name: qareports-secret-key
+        configMap:
+          name: qareports-secret-key
+
+      - name: qareports-ssh-key
+        secret:
+          secretName: qareports-ssh-key
+
+      - name: ssh-folder
+        emptyDir: {}
+
+      initContainers:
+      - name: init-qareports-worker
+        image: squadproject/squad
+        imagePullPolicy: "Always"
+        command: ["sh", "-c", "cp /app/id_rsa /app/.ssh/id_rsa && chown -R squad:squad /app/.ssh && chmod 0600 /app/.ssh/id_rsa"]
+        securityContext:
+          runAsUser: 0
+
+        volumeMounts:
+        - name: ssh-folder
+          mountPath: /app/.ssh
+
+        - name: qareports-ssh-key
+          mountPath: /app/id_rsa
+          subPath: id_rsa
+
+      containers:
+      - name: qareports-worker
+        image: squadproject/squad
+        imagePullPolicy: "Always"
+        command: ["sh", "-c"]
+        args:
+        - squad-worker --exclude-queues=ci_fetch --concurrency=3 --without-mingle
+
+        envFrom:
+        - secretRef:
+            name: qareports-environment
+
+        volumeMounts:
+        - name: qareports-secret-key
+          mountPath: /app/secret.dat
+          subPath: secret.dat
+
+        - name: ssh-folder
+          mountPath: /app/.ssh
+
+        resources:
+          requests:
+            memory: "256M"
+            cpu: "250m"
+
+          limits:
+            memory: "1024M"
+            cpu: "1"

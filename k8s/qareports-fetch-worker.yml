@@ -1,0 +1,71 @@
+#
+# Autoscale pods to have minumum of 2 pods up to 10 pods
+# depending on CPU average load
+#
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: qareports-fetch-worker-autoscale
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: qareports-fetch-worker-deployment
+
+---
+
+#
+# Deploy one pod of qareports container to run as worker
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qareports-fetch-worker-deployment
+  labels:
+    app: qareports-fetch-worker
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qareports-fetch-worker
+
+  template:
+    metadata:
+      labels:
+        app: qareports-fetch-worker
+
+    spec:
+      volumes:
+      - name: qareports-secret-key
+        configMap:
+          name: qareports-secret-key
+
+      containers:
+      - name: qareports-fetch-worker
+        image: squadproject/squad
+        imagePullPolicy: "Always"
+        command: ["sh", "-c"]
+        args:
+        - squad-worker --exclude-queues=ci_poll,ci_quick,core_notification,core_postprocess,core_quick,core_reporting --concurrency=1 --without-mingle
+
+        envFrom:
+        - secretRef:
+            name: qareports-environment
+
+        volumeMounts:
+        - name: qareports-secret-key
+          mountPath: /app/secret.dat
+          subPath: secret.dat
+
+        resources:
+          requests:
+            memory: "2048M"
+            cpu: "2"
+
+          limits:
+            memory: "4096M"
+            cpu: "2"

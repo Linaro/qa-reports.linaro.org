@@ -1,0 +1,17 @@
+---
+
+- name: Configure k8s
+  hosts: master,worker
+  roles:
+    - k8s
+  handlers:
+    - name: docker status
+      service: name=docker state=started
+
+- name: Configure services
+  hosts: services
+  roles:
+    - services
+  handlers:
+    - name: restart-rabbitmq
+      command: systemctl restart rabbitmq-server

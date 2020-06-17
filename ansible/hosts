@@ -1,0 +1,15 @@
+[master]
+master-node ansible_host=master-node master_node=1 node_ip=172.31.1.10
+[worker]
+worker-node ansible_host=worker-node worker_node=1 node_ip=172.31.1.11
+[services]
+services-node ansible_host=services-node
+[all:vars]
+env=dev
+master_node=0
+worker_node=0
+master_hostname=master-node
+database_hostname=services-node
+ansible_user=vagrant
+ansible_ssh_common_args="-F .vagrant/ssh_config -o StrictHostKeyChecking=no"
+ansible_python_interpreter=/usr/bin/python3

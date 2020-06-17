@@ -1,0 +1,301 @@
+#!/bin/bash
+
+set -e
+
+available_envs="dev|testing|staging|production"
+
+
+check_dep () {
+    if ! which "$1" > /dev/null
+    then
+      echo "Could not find $1! Please install it"
+      exit 1
+    fi
+}
+
+
+# At least kubectl needs to be installed to continue
+check_dep kubectl
+
+
+qareports_help() {
+    echo "This is qareports' deploy management tool."
+    echo
+    echo "Usage: ./qareports $available_envs [command[args]]"
+    echo
+    echo "Commands:"
+    echo "  up             create the entire setup"
+    echo "  destroy        destroy the entire setup"
+    echo "  list           show all services (e.g. frontend, workers, etc)"
+    echo "  upgrade_squad  upgrade SQUAD image in all deployments"
+    echo "  deploy         apply all configuration files"
+    echo "  pods           show all pods"
+    echo "  top            show CPU and Memory usage in all pods"
+    echo "  ssh node|pod   ssh into a node or a pod"
+    echo "  logs [-f] pod  display logs for a given pod, pass -f to keep following"
+    echo "  dashboard      pop up a kubernetes dashboard"
+    echo "  k              runs kubectl for k8s specific commands"
+    echo
+    echo "Example:"
+    echo "  $ ./qareports production upgrade_squad  # probably the most frequent command"
+}
+
+qareports_up() {
+    echo "Creating $environment"
+
+    if [ $environment == "dev" ]
+    then
+        echo "It should take a few minutes, after that you should be able to see qareports in action at http://172.31.4.240"
+        # Set up 2 virtubalboxes and install kubernetes
+        check_dep vagrant
+        cd ansible
+        vagrant up
+        ./deploy
+        cd ..
+
+        # Get generated kubeconfig
+        scp \
+            -F ansible/.vagrant/ssh_config \
+            -o StrictHostKeyChecking=no \
+            master-node:/home/vagrant/.kube/config $KUBECONFIG
+
+        # Prepare k8s environment
+        k apply -f k8s/qareports-dev.yml
+        kubectl apply -f k8s/metrics-server-dev.yml
+    else
+        echo "Creating terraform dependencies for $environment"
+        cd terraform
+        echo "Shared resources need to be managed first"
+        check_dep terraform
+        ./terraform shared apply
+        echo
+        echo "Done"
+        echo
+        echo "${environment} resources are about to be managed"
+        ./terraform $environment apply
+        cd ..
+        kubectl apply -f k8s/metrics-server-aws.yml
+        kubectl -n kube-system apply -f k8s/aws-smtp-relay.yml
+    fi
+
+    sleep $((60 * 2))  # wait about 2 minutes for kube-system pods to get started
+    qareports_deploy
+    qareports_list
+}
+
+qareports_destroy() {
+    echo "Destroying $environment"
+    if [ $environment == "dev" ]
+    then
+        # Set up 2 virtubalboxes and install kubernetes
+        check_dep vagrant
+        rm -rf $KUBECONFIG ansible/.vagrant/ssh_config
+        cd ansible
+        vagrant destroy -f
+    else
+        # Destroy production/staging-specific resources
+        # EKS cluster and VPC should be done manually, if that's the intention
+        check_dep terraform
+        cd terraform
+        ./terraform ${environment} destroy
+    fi
+}
+
+qareports_migrate_db() {
+    k apply -f k8s/qareports-migration.yml  # start job to apply migration, delete when finish
+    k wait --for=condition=complete --timeout=1800s job/qareports-migration  # Wait 30 minutes for migration to complete
+    if [ $? != 0 ]
+    then
+        echo "Failed to apply migration:"
+        k logs job/qareports-migration
+        k delete -f k8s/qareports-migration.yml  # delete failed migration job
+        echo "*** ABORTING !!! ***"
+        exit 1
+    fi
+
+    k delete -f k8s/qareports-migration.yml  # delete completed migration job
+}
+
+qareports_update_environment_variables(){
+    check_dep ansible
+    ./scripts/ansible-vault view secrets/${environment} | ./scripts/translate_secrets.py ${environment} | k apply -f -
+}
+
+qareports_upgrade_squad() {
+    echo "Upgraging $environment"
+
+    qareports_migrate_db
+
+    k rollout restart deployment  # Rollout all deployments at once
+}
+
+qareports_deploy() {
+    echo "Deploying $environment"
+
+    # set secrets/environment variables
+    if [ $environment == "dev" ]
+    then
+        k apply -f k8s/qareports-dev.yml
+        ./scripts/translate_secrets.py $environment < secrets/dev | k apply -f -
+    else
+        qareports_update_environment_variables
+        check_dep ansible
+        ./scripts/ansible-vault view secrets/qareports-ldap.yml | k apply -f -
+        ./scripts/ansible-vault view secrets/qareports-ssh.yml | k apply -f -
+    fi
+    qareports_migrate_db
+    k apply -f k8s/qareports-web.yml                   # startup frontend deploy
+    k apply -f k8s/qareports-worker.yml                # startup worker (no fetching) deploy
+    k apply -f k8s/qareports-listener.yml              # startup listener deploy
+    k apply -f k8s/qareports-scheduler.yml             # startup scheduler deploy
+    k apply -f k8s/qareports-fetch-worker.yml          # startup fetch worker deploy
+
+    k rollout restart deployment  # Rollout all deployments at once
+}
+
+qareports_list() {
+    echo "Showing services for $environment"
+    echo
+    echo "Nodes"
+    k get nodes -o wide
+    k top nodes
+    echo
+    echo "Pods"
+    k get pods -o wide
+    k top pods
+    echo
+    echo "Services"
+    k get svc
+    echo
+    echo "Deployments"
+    k get deployments
+    echo
+    echo "Horizontal Autoscale stats"
+    k get hpa
+    echo
+    echo "Available namespaces"
+    k get namespaces
+}
+
+qareports_pods(){
+    echo "Showing pods for $environment"
+    k get pods
+}
+
+qareports_top(){
+    echo "Showing pods' stats for $environment"
+    k top pods
+}
+
+qareports_logs(){
+    if [ $# -lt 1 ]
+    then
+        echo "'$0 $environment logs' requires a pod (check 'list' command)"
+        echo
+        qareports_help
+        exit 1
+    fi
+    echo "Showing logs for $environment"
+    k logs "$@"
+}
+
+qareports_k(){
+    echo "Running kubectl on $environment"
+    k "$@"
+}
+
+# Make sure to run all commands on $environment namespace
+k(){
+    kubectl -n qareports-$environment "$@"
+}
+
+qareports_ssh() {
+    if [ $# -lt 1 ]
+    then
+        echo "'$0 $environment ssh' requires a node or pod (check 'list' command)"
+        echo
+        qareports_help
+        exit 1
+    fi
+
+    echo "SSH'ing in $environment/$1"
+
+    # Check if it's pod or node
+    resource=$1
+    if [[ $resource =~ "deployment" ]]
+    then
+        echo "SSH'ing into $environment pod"
+        k exec -it $resource -- bash
+    else
+        echo "SSH'ing into $environment node"
+        if [ $environment == "dev" ]
+        then
+            ssh -F ansible/.vagrant/ssh_config -o StrictHostKeyChecking=no $resource
+        else
+            # Figure how to show production/staging RabbitMQ, Postgres and NAT nodes
+            echo "ssh $resource"
+        fi
+    fi
+}
+
+qareports_dashboard() {
+    echo "Bringing kubernetes-dashboard for $environment: not yet implemented :)"
+}
+
+if [ $# -lt 1 ]
+then
+    qareports_help
+    exit 1
+fi
+
+
+environment=$1
+shift
+re="^($available_envs)$"
+if [[ ! $environment =~ $re ]]
+then
+    echo "$environment does not match any of $available_envs"
+    qareports_help
+    exit 1
+fi
+
+
+if [ $# -lt 1 ]
+then
+    echo "'command' is missing"
+    echo
+    qareports_help
+    exit 1
+fi
+
+
+command=$1
+command_exists=$(grep -c qareports_$command $0 || :)
+shift
+if [ $command_exists == 0 ]
+then
+    echo "'$command' does not match any valid command"
+    echo
+    qareports_help
+    exit 1
+fi
+
+# If KUBECONFIG is already set, skip this
+if [ -z "$KUBECONFIG" ]
+then
+    # Set kubeconfig for kubectl to work properly
+    if [ $environment == "dev" ]
+    then
+        export KUBECONFIG="./kubeconfig"
+    else
+        export KUBECONFIG="./terraform/generated/kubeconfig"
+        if [ ! -e $KUBECONFIG ]
+        then
+            echo "$KUBECONFIG does not exist yet! You need to run ./terraform shared apply"
+            exit 1
+        fi
+    fi
+fi
+
+command=qareports_$command
+$command "$@"

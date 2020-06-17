@@ -1,0 +1,42 @@
+#
+# Deploy one qareports container running squad-listener
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qareports-listener-deployment
+  labels:
+    app: qareports-listener
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qareports-listener
+
+  template:
+    metadata:
+      labels:
+        app: qareports-listener
+
+    spec:
+      containers:
+      - name: qareports-listener
+        image: squadproject/squad
+        imagePullPolicy: "Always"
+        command: ["sh", "-c"]
+        args:
+        - squad-listener
+
+        envFrom:
+        - secretRef:
+            name: qareports-environment
+
+        resources:
+          requests:
+            memory: "512M"
+            cpu: "500m"
+
+          limits:
+            memory: "512M"
+            cpu: "500m"

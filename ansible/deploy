@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -eu
+
+if [ $# -eq 0 ]; then
+    set -- 'site.yml'
+fi
+
+extra_arg=''
+if [ -d .vagrant ]; then
+    vagrant ssh-config > .vagrant/ssh_config
+fi
+
+inventory="./hosts"
+export ANSIBLE_CONFIG="./ansible.cfg"
+
+ansible --version
+
+exec ansible-playbook \
+    --inventory-file="$inventory" \
+    --become \
+    $extra_arg \
+    "$@"

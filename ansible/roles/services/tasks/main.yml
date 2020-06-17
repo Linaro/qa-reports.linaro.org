@@ -1,0 +1,63 @@
+# For some reason I still don't understand, services-node stalls trying to use apt with ipv6
+# This hack disables ipv6 all along. ref: https://www.linuxbabe.com/ubuntu/disable-ipv6-on-ubuntu
+- name: Disable all ipv6
+  sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Install PostgreSQL and RabbitMQ
+  apt: pkg={{item}} state=present update-cache=yes
+  with_items:
+    - postgresql
+    - rabbitmq-server
+
+- name: RabbitMQ config
+  template:
+    src: roles/services/templates/rabbitmq.config
+    dest: /etc/rabbitmq/rabbitmq.config
+  notify: restart-rabbitmq
+
+- name: get PostgreSQL config file
+  shell: 'find /etc/postgresql -name postgresql.conf | head -1'
+  register: postgresql_conf
+  changed_when: false
+
+- name: get PostgreSQL pg_hba.conf
+  shell: 'find /etc/postgresql -name pg_hba.conf | head -1'
+  register: pg_hba_conf
+  changed_when: false
+
+- name: configure PostgreSQL networking
+  register: postgresql_networking
+  lineinfile:
+    dest: '{{postgresql_conf.stdout}}'
+    line: "listen_addresses = '*'"
+
+- name: configure pg_hba
+  register: pg_hba
+  lineinfile:
+    dest: '{{pg_hba_conf.stdout}}'
+    line: 'host     all             all             samenet                 md5'
+
+- name: restart PostgreSQL
+  shell: systemctl restart postgresql
+  when: postgresql_networking.changed or pg_hba.changed
+  changed_when: false
+
+- name: create database user
+  shell: 'sudo -u postgres createuser devqareports || true'
+  register: createuser
+  changed_when: '"already exists" not in createuser.stderr'
+
+- name: set database password
+  shell: |
+    sudo -u postgres psql -c "ALTER USER devqareports WITH PASSWORD 'devqareports'" || true
+  changed_when: false
+
+- name: create database
+  shell: 'sudo -u postgres createdb --owner=devqareports devqareports || true'
+  register: createdb
+  changed_when: '"already exists" not in createdb.stderr'

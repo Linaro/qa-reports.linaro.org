@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Had to import following resources into state
+# ./terraform shared import aws_vpc.qareports_vpc vpc-097c92bf21a7082e9
+# ./terraform shared import aws_internet_gateway.qareports_igw igw-0539f3dd76ff1b9e3
+# ./terraform shared import aws_subnet.qareports_public_subnet_1 subnet-08375ce285b190f06
+# ./terraform shared import aws_subnet.qareports_public_subnet_2 subnet-0197bdcd7f985caa4
+
+set -eu
+
+environment=$1
+re="^(testing|staging|production|shared)$"
+if [[ ! $environment =~ $re ]]
+then
+    echo "usage: ./terraform [testing|staging|production|shared] command"
+    exit 1
+fi
+
+# Make sure auto-generated directory exists
+[ -d generated ] || mkdir generated
+
+# Authenticate to AWS
+# export AWS{ACCESS_KEY_ID,SECRET_ACCESS_KEY,SESSION_TOKEN}
+`./scripts/aws_auth.sh`
+
+if [ "$environment" == "shared" ]
+then
+    cd shared
+else
+    export TF_CLI_ARGS="-var-file=generated/shared.tfvars -var-file=${environment}.tfvars"
+    export TF_VAR_db_name=$(../scripts/ansible-vault view ../secrets/${environment}     | grep ^database_name     | awk '{print $2}')
+    export TF_VAR_db_username=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^database_username | awk '{print $2}')
+    export TF_VAR_db_password=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^database_password | awk '{print $2}')
+fi
+
+export TF_DATA_DIR=.terraform_${environment}
+
+cat <<EOF > state.tf
+# This file defines which state file to use when running terraform.
+# We use a state file per environment, so this file must be updated
+# every time terraform is run.
+terraform {
+    backend "s3" {
+        bucket = "linaro-terraform-state"
+        key = "qa-reports/${environment}/terraform.tfstate"
+        region = "us-east-1"
+    }
+}
+EOF
+
+
+# init if needed
+if [ ! -d "${TF_DATA_DIR}" ]; then
+    terraform init
+fi
+
+shift
+if [ $# -eq 0 ]; then
+    set -- plan .
+fi
+
+terraform "$@"

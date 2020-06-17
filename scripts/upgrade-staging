@@ -1,0 +1,17 @@
+#!/bin/bash
+
+export KUBECONFIG="/home/ubuntu/.kube/config"
+
+#
+#   This script is supposed to be run from NAT instance to upgrade staging deployments only.
+#
+if [ ! -e $KUBECONFIG ]
+then
+    # "--name" is same as ./terraform/shared/variables.tf:cluster_name
+    aws eks update-kubeconfig --name QAREPORTS_EKSCluster --region us-east-1
+fi
+
+cd /home/ubuntu/qa-reports.linaro.org && git pull
+
+# Migrate DB and source code only, environment/configuration updates require a human
+./qareports staging upgrade_squad
