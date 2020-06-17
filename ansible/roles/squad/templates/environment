@@ -9,7 +9,7 @@ SQUAD_EXTRA_SETTINGS={{install_base}}/linaro_ldap.py
 SQUAD_SITE_NAME="{{site_name}}"
 SQUAD_LOG_LEVEL=INFO
 SQUAD_EMAIL_FROM=qa-reports@linaro.org
-SQUAD_ADMINS='Antonio Terceiro <antonio.terceiro@linaro.org>, Milosz Wasilewski <milosz.wasilewski@linaro.org>, Charles Oliveira <charles.oliveira@linaro.org>'
+SQUAD_ADMINS='Antonio Terceiro <antonio.terceiro@linaro.org>, Milosz Wasilewski <milosz.wasilewski@linaro.org>, Charles Oliveira <charles.oliveira@linaro.org>, Amro Hassaan <amro.hassaan@linaro.org>'
 ENV={{env}}
 GUNICORN_CMD_ARGS="--workers 2"
 {% if use_rabbitmq %}
