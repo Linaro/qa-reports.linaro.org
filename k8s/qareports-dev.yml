@@ -1,0 +1,53 @@
+#
+#   Create a namespace for dev
+#
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: qareports-dev
+
+---
+
+#
+#   Mount empty files for ldap settings
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qareports-ldap-conf
+data:
+  linaro_ldap_backends.py: |-
+    # Empty for dev
+
+  linaro_ldap.py: |-
+    # Empty for dev
+
+---
+
+#
+#   Create a dummy secret
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qareports-secret-key
+data:
+  secret.dat: "1234567890"
+
+---
+
+#
+# Expose qareports-web pods externally
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: qareports-web-service
+spec:
+  selector:
+    app: qareports-web
+  ports:
+    - port: 80
+  type: LoadBalancer
+  externalIPs:
+  - 172.31.4.240

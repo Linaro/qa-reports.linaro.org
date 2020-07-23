@@ -1,0 +1,11 @@
+# DO NOT CHANGE THIS FILE BY HAND
+ssh_key_name         = "${ssh_key_name}"
+eks_cluster_name     = "${eks_cluster_name}"
+ami_id               = "${ami_id}"
+vpc_id               = "${vpc_id}"
+vpc_cidr             = "${vpc_cidr}"
+region               = "${region}"
+public_subnet1_id    = "${public_subnet1_id}"
+public_subnet2_id    = "${public_subnet2_id}"
+private_subnet1_cidr = "${private_subnet1_cidr}"
+private_subnet2_cidr = "${private_subnet2_cidr}"

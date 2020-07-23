@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.define "master-node" do |master|
+    master.vm.box = "ubuntu/xenial64"
+    master.vm.hostname = "master-node"
+    master.vm.network "private_network", ip: "172.31.1.10"
+    master.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+    master.vm.provider :libvirt do |domain|
+      domain.machine_virtual_size = 30
+    end
+  end
+
+  config.vm.define "worker-node" do |worker|
+    worker.vm.box = "ubuntu/xenial64"
+    worker.vm.hostname = 'worker-node'
+    worker.vm.network "private_network", ip: "172.31.1.11"
+    worker.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "4096", "--cpus", "4"]
+    end
+  end
+
+  config.vm.define "services-node" do |services|
+    services.vm.box = "ubuntu/xenial64"
+    services.vm.hostname = 'services-node'
+    services.vm.network "private_network", ip: "192.168.50.10"
+  end
+
+  config.vm.provider :libvirt do |domain|
+    domain.memory = 1024
+    domain.cpus = 1
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+  DEBIAN_FRONTEND=noninteractive apt-get install -qy avahi-daemon python3
+  SHELL
+end

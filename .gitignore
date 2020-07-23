@@ -3,3 +3,6 @@ hosts.local
 *.swp
 .terraform.tfstate.lock.info
 /tmp
+terraform/generated/*
+terraform.tfstate.*
+.vagrant

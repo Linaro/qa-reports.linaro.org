@@ -1,0 +1,1 @@
+SQUAD_USERNAME=squad SQUAD_PASSWORD="secret" locust -f example.py -H https://testing-qa-reports.ctt.linaro.org --headless --users 250 --hatch-rate 25 --run-time 300s--headless

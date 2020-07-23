@@ -2,43 +2,21 @@
 
 set -eu
 
-if [ $# -lt 1 ]; then
-    echo "usage: $0 dev|staging|production [ansible-opts]"
-    exit 1
-fi
-
-env="$1"
-shift
 if [ $# -eq 0 ]; then
     set -- 'site.yml'
 fi
-basedir=$(dirname $0)
 
 extra_arg=''
-if [ "$env" = 'dev' ] && [ -d ../.vagrant ]; then
-    vagrant ssh-config > ../.vagrant/ssh_config
+if [ -d .vagrant ]; then
+    vagrant ssh-config > .vagrant/ssh_config
 fi
 
-inventory="${basedir}/hosts.${env}"
-
-use_vault=
-case "$@" in
-    *--vault-password-file*)
-        :
-        ;;
-    *)
-        if [ "$env" = "production" -o "$env" = "staging" ]; then
-            use_vault="--vault-password-file=$basedir/vault-passwd"
-        fi
-        ;;
-esac
-
-export ANSIBLE_CONFIG="${basedir}/ansible.cfg"
+inventory="./hosts"
+export ANSIBLE_CONFIG="./ansible.cfg"
 
 ansible --version
 
 exec ansible-playbook \
-    $use_vault \
     --inventory-file="$inventory" \
     --become \
     $extra_arg \

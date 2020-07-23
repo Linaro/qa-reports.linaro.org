@@ -1,0 +1,79 @@
+---
+- name: Disable swap
+  command: swapoff -a
+
+# ref: https://github.com/do-community/ansible-playbooks.git
+- name: Prepare for docker install
+  apt: pkg={{item}} state=present update-cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - gnupg-agent
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt: update-cache=yes pkg={{item}} state=present
+  with_items:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+  notify:
+    - docker status
+
+- name: Add vagrant user to docker group
+  user:
+    name: vagrant
+    group: docker
+
+- name: Add an apt signing key for Kubernetes
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Adding apt repository for Kubernetes
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+
+- name: Install Kubernetes binaries
+  apt: update-cache=yes pkg={{item}} state=present
+  with_items:
+    - kubelet
+    - kubeadm
+    - kubectl
+  register: installed
+
+# ref: https://medium.com/@joatmon08/playing-with-kubeadm-in-vagrant-machines-part-2-bac431095706
+- name: Add kubelet extra arg
+  lineinfile:
+    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    line: 'Environment="KUBELET_EXTRA_ARGS=--node-ip={{node_ip}}"'
+    insertbefore: ExecStart=
+
+- name: Restart kubelet
+  service:
+    name: kubelet
+    daemon_reload: yes
+    state: restarted
+
+- include_role:
+    name: k8s
+    tasks_from: master.yml
+  when: master_node
+
+- include_role:
+    name: k8s
+    tasks_from: worker.yml
+  when: worker_node

@@ -1,61 +1,62 @@
-#!/bin/sh
+#!/bin/bash
+
+# Had to import following resources into state
+# ./terraform shared import aws_vpc.qareports_vpc vpc-097c92bf21a7082e9
+# ./terraform shared import aws_internet_gateway.qareports_igw igw-0539f3dd76ff1b9e3
+# ./terraform shared import aws_subnet.qareports_public_subnet_1 subnet-08375ce285b190f06
+# ./terraform shared import aws_subnet.qareports_public_subnet_2 subnet-0197bdcd7f985caa4
 
 set -eu
 
-ENV=${ENV:-staging}
-export TF_DATA_DIR=.terraform_${ENV}
-
-conf=$(dirname $0)/auth.conf
-if [ -r "$conf" ]; then
-    . "$conf"
-fi
-if [ -z "${aws_profile:-}" ]; then
-    echo "E: \$aws_profile must be set."
-    echo "I: Either set it in the environment, or in $conf"
+environment=$1
+re="^(testing|staging|production|shared)$"
+if [[ ! $environment =~ $re ]]
+then
+    echo "usage: ./terraform [testing|staging|production|shared] command"
     exit 1
 fi
 
-# data
-duration=3600
+# Make sure auto-generated directory exists
+[ -d generated ] || mkdir generated
 
-# assume the qa-admin role
-credentials_dir=$HOME/.cache/qa-reports.linaro.org
-credentials="$credentials_dir/admin_credentials"
-mkdir -p "$credentials_dir"
-chmod 700 "$credentials_dir"
-
-if [ -e "$credentials" ]; then
-    now=$(date +%s)
-    credentials_created=$(stat --format=%Y "$credentials")
-    if [ $((now - credentials_created)) -gt $duration ]; then
-        rm -f "$credentials"
-    fi
-fi
-if [ ! -e "$credentials" ] || [ ! -s "$credentials" ]; then
-    touch "$credentials"
-    chmod 600 "$credentials"
-    aws2-wrap --profile "$aws_profile" --export >> "$credentials"
-fi
-
+# Authenticate to AWS
 # export AWS{ACCESS_KEY_ID,SECRET_ACCESS_KEY,SESSION_TOKEN}
-. $credentials
+`./scripts/aws_auth.sh`
 
-# environment
-./scripts/set_env.sh "$ENV"
-eval $(./scripts/load_db_password "$ENV")
+if [ "$environment" == "shared" ]
+then
+    cd shared
+else
+    export TF_CLI_ARGS="-var-file=generated/shared.tfvars -var-file=${environment}.tfvars"
+    export TF_VAR_db_name=$(../scripts/ansible-vault view ../secrets/${environment}     | grep ^database_name     | awk '{print $2}')
+    export TF_VAR_db_username=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^database_username | awk '{print $2}')
+    export TF_VAR_db_password=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^database_password | awk '{print $2}')
+fi
+
+export TF_DATA_DIR=.terraform_${environment}
+
+cat <<EOF > state.tf
+# This file defines which state file to use when running terraform.
+# We use a state file per environment, so this file must be updated
+# every time terraform is run.
+terraform {
+    backend "s3" {
+        bucket = "linaro-terraform-state"
+        key = "qa-reports/${environment}/terraform.tfstate"
+        region = "us-east-1"
+    }
+}
+EOF
+
 
 # init if needed
 if [ ! -d "${TF_DATA_DIR}" ]; then
     terraform init
 fi
 
+shift
 if [ $# -eq 0 ]; then
     set -- plan .
 fi
 
-export TF_CLI_ARGS="-var-file=shared.tfvars -var-file=${ENV}.tfvars"
-
 terraform "$@"
-
-# set the stage for ansible
-terraform state pull | ./scripts/state_to_ansible_inventory.py > "../ansible/hosts.${ENV}"

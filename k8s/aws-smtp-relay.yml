@@ -1,0 +1,52 @@
+#
+# Deploy a smtp-relay so that workers can send email
+# through AWS SES using IAM roles
+#
+# aws-smtp-relay will be deployed in kube-system namespace
+# in production/staging, which should be a non-fargate node
+# so that we can attach and SES policy to allow internal
+# pods to send emails using IAM to authenticate to SES
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-smtp-relay-deployment
+  namespace: kube-system
+  labels:
+    app: aws-smtp-relay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aws-smtp-relay
+  template:
+    metadata:
+      labels:
+        app: aws-smtp-relay
+    spec:
+      containers:
+      - name: aws-smtp-relay
+        image: blueimp/aws-smtp-relay
+        env:
+        - name: AWS_REGION
+          value: "us-east-1"
+        resources:
+          requests:
+            memory: "128M"
+            cpu: "250m"
+          limits:
+            memory: "128M"
+            cpu: "250m"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aws-smtp-relay
+  namespace: kube-system
+spec:
+  selector:
+    app: aws-smtp-relay
+  ports:
+    - protocol: TCP
+      port: 1025

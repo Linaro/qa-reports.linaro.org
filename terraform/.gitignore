@@ -1,4 +1,8 @@
 .terraform*
+.terraform.tfstate.lock.info
+terraform/generated
+terraform.tfstate
+terraform.tfstate.backup
 errored.tfstate
-qa-reports_override.tf
+state.tf
 auth.conf

@@ -1,0 +1,43 @@
+#
+#   Apply migration before each update
+#
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: qareports-migration
+spec:
+  template:
+    metadata:
+      name: qareports-migration
+    spec:
+      restartPolicy: Never
+      volumes:
+      - name: qareports-secret-key
+        configMap:
+          name: qareports-secret-key
+
+      containers:
+      - name: qareports-migration
+        image: squadproject/squad
+        imagePullPolicy: "Always"
+        command: ["squad-admin"]
+        args:
+        - migrate
+
+        envFrom:
+        - secretRef:
+            name: qareports-environment
+
+        volumeMounts:
+        - name: qareports-secret-key
+          mountPath: /app/secret.dat
+          subPath: secret.dat
+
+        resources:
+          requests:
+            memory: "4096M"
+            cpu: "2"
+
+          limits:
+            memory: "8192M"
+            cpu: "2"
