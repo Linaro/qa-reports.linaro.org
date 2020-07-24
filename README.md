@@ -27,8 +27,11 @@ This should make sure all resources are created and running.
 Run this command when there's a new release of SQUAD available in https://hub.docker.com/r/squadproject/squad/tags:
 
 ```bash
-$ ./qareports production upgrade_squad
+$ ./qareports production upgrade_squad [squad-release]
 ```
+
+If squad-release, e.g. 1.16, is given, then all images will be replaced by that specific one. If no
+tag is given, qareports will be upgraded to the latest tag in dockerhub.
 
 NOTE: this will update SQUAD code only, it doesn't update environment variables or other setup in this repo.
 
