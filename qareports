@@ -3,6 +3,11 @@
 set -e
 
 available_envs="dev|testing|staging|production"
+squad_dockerhub="squadproject/squad"
+
+docker_tag_exists() {
+    curl --silent -f -lSL https://index.docker.io/v1/repositories/$squad_dockerhub/tags/$1 > /dev/null
+}
 
 
 check_dep () {
@@ -14,7 +19,6 @@ check_dep () {
 }
 
 
-# At least kubectl needs to be installed to continue
 check_dep kubectl
 
 
@@ -102,7 +106,15 @@ qareports_destroy() {
 }
 
 qareports_migrate_db() {
-    k apply -f k8s/qareports-migration.yml  # start job to apply migration, delete when finish
+    if [ $# == 1 ]
+    then
+        image=$1
+        sed "s%squadproject/squad%\"$image\"%" k8s/qareports-migration.yml | k apply -f -
+    else
+        k apply -f k8s/qareports-migration.yml  # start job to apply migration, delete when finish
+    fi
+
+
     k wait --for=condition=complete --timeout=1800s job/qareports-migration  # Wait 30 minutes for migration to complete
     if [ $? != 0 ]
     then
@@ -124,9 +136,28 @@ qareports_update_environment_variables(){
 qareports_upgrade_squad() {
     echo "Upgraging $environment"
 
-    qareports_migrate_db
+    if [ $# == 1 ]
+    then
+        squad_release=$1
+        image="${squad_dockerhub}:${squad_release}"
+        if ! docker_tag_exists $squad_release
+        then
+            echo "Docker image $image not found! Aborting upgrade..."
+            exit 1
+        fi
 
-    k rollout restart deployment  # Rollout all deployments at once
+        qareports_migrate_db $image
+
+        k set image deployment/qareports-web-deployment init-qareports-web=$image qareports-web=$image
+        k set image deployment/qareports-worker-deployment qareports-worker=$image
+        k set image deployment/qareports-listener-deployment qareports-listener=$image
+        k set image deployment/qareports-scheduler-deployment qareports-scheduler=$image
+        k set image deployment/qareports-fetch-worker-deployment qareports-fetch-worker=$image
+    else
+        qareports_migrate_db
+        k rollout restart deployment  # Rollout all deployments at once
+    fi
+
 }
 
 qareports_deploy() {
