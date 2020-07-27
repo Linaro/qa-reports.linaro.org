@@ -33,6 +33,7 @@ qareports_help() {
     echo "  list           show all services (e.g. frontend, workers, etc)"
     echo "  upgrade_squad  upgrade SQUAD image in all deployments"
     echo "  deploy         apply all configuration files"
+    echo "  queues [-w]    show all queues"
     echo "  pods           show all pods"
     echo "  top            show CPU and Memory usage in all pods"
     echo "  ssh node|pod   ssh into a node or a pod"
@@ -206,6 +207,40 @@ qareports_list() {
     echo
     echo "Available namespaces"
     k get namespaces
+}
+
+qareports_queues(){
+    echo "Showing queues for $environment"
+    
+    rabbitmq_host=./terraform/generated/${environment}_rabbitmq_host_public
+    if [ ! -f $rabbitmq_host ]
+    then
+        echo "Could not find public IP address of RabbitMQ for $environment"
+        echo "Consider running cd terraform && ./terraform $environment apply"
+        exit 1
+    fi
+    mq_ip=$(cat $rabbitmq_host)
+
+    qareports_private_ssh_key=./tmp/qareports_private_ssh_key
+    test -e tmp || mkdir -p tmp
+    if [ ! -f $qareports_private_ssh_key ]
+    then
+        ./scripts/ansible-vault view secrets/qareports_private_key > $qareports_private_ssh_key
+        chmod 0600 $qareports_private_ssh_key
+    fi
+
+    watching=no
+    if [ $# == 1 ] && [ "$1" == "-w" ]
+    then
+        watching=yes
+    fi
+
+    if [ $watching == yes ]
+    then
+        ssh -i $qareports_private_ssh_key ubuntu@${mq_ip} -t sudo watch rabbitmqctl list_queues
+    else
+        ssh -i $qareports_private_ssh_key ubuntu@${mq_ip} sudo rabbitmqctl list_queues
+    fi
 }
 
 qareports_pods(){

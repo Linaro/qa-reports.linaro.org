@@ -50,6 +50,7 @@ update SQUAD at the very last step.
 
 Here is a list of handy commands to manage qareports:
 
+* `./qareports production queues -w` lists all queues in production and keep watching
 * `./qareports production pods` lists all pods running in production
 * `./qareports production top` lists all pods' stats of CPU and memory
 * `./qareports production logs -f pod-name-with-hash` displays logs for a given pod
