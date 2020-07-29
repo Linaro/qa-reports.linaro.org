@@ -103,7 +103,7 @@ spec:
     spec:
       initContainers:
       - name: init-qareports-web
-        image: squadproject/squad
+        image: squadproject/squad:release
         imagePullPolicy: "Always"
         command: ["cp", "-r", "/app/static", "/qareports_static"]
         volumeMounts:
@@ -138,7 +138,7 @@ spec:
             cpu: "500m"
 
       - name: qareports-web
-        image: squadproject/squad
+        image: squadproject/squad:release
         imagePullPolicy: "Always"
         command: ["sh", "-c"]
         args:

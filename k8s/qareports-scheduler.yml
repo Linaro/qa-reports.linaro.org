@@ -27,7 +27,7 @@ spec:
 
       containers:
       - name: qareports-scheduler
-        image: squadproject/squad
+        image: squadproject/squad:release
         imagePullPolicy: "Always"
         command: ["sh", "-c"]
         args:

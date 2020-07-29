@@ -18,7 +18,7 @@ spec:
 
       containers:
       - name: qareports-migration
-        image: squadproject/squad
+        image: squadproject/squad:release
         imagePullPolicy: "Always"
         command: ["squad-admin"]
         args:
