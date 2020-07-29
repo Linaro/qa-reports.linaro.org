@@ -110,7 +110,7 @@ qareports_migrate_db() {
     if [ $# == 1 ]
     then
         image=$1
-        sed "s%squadproject/squad%\"$image\"%" k8s/qareports-migration.yml | k apply -f -
+        sed "s%squadproject/squad:release%\"$image\"%" k8s/qareports-migration.yml | k apply -f -
     else
         k apply -f k8s/qareports-migration.yml  # start job to apply migration, delete when finish
     fi

@@ -46,7 +46,7 @@ spec:
 
       containers:
       - name: qareports-fetch-worker
-        image: squadproject/squad
+        image: squadproject/squad:release
         imagePullPolicy: "Always"
         command: ["sh", "-c"]
         args:
