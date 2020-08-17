@@ -67,5 +67,5 @@ spec:
             cpu: "2"
 
           limits:
-            memory: "4096M"
+            memory: "5120M"
             cpu: "2"
