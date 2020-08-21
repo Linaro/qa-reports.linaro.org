@@ -27,6 +27,7 @@ data "template_file" "shared_vars" {
     vpc_id               = "${aws_vpc.qareports_vpc.id}"
     vpc_cidr             = "${aws_vpc.qareports_vpc.cidr_block}"
     region               = "${var.region}"
+    route53_zone_id      = "${var.route53_zone_id}"
     ssh_key_name         = "${aws_key_pair.qareports_ssh_key.key_name}"
     eks_cluster_name     = "${aws_eks_cluster.qareports_eks_cluster.name}"
     public_subnet1_id    = "${aws_subnet.qareports_public_subnet_1.id}"

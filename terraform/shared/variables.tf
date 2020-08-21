@@ -12,3 +12,13 @@ variable "region" {
     type = "string"
     default = "us-east-1"
 }
+
+variable "ci_endpoint_url" {
+    type = "string"
+    default = "ci-endpoint-qa-reports.ctt.linaro.org"
+}
+
+variable "route53_zone_id" {
+    type = "string"
+    default = "Z27NRA2FV79C84"
+}
