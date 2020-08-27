@@ -48,10 +48,11 @@ db = {
     'name': variables.get('database_name', '%sqareports' % environment),
     'username': variables.get('database_username', 'qareports'),
     'password': variables.get('database_password'),
+    'options': variables.get('database_options', '{}'),
 }
 
 defaults = {
-    'DATABASE': 'ENGINE=django.db.backends.postgresql_psycopg2:NAME={db[name]}:HOST={db[host]}:USER={db[username]}:PASSWORD={db[password]}'.format(db=db),
+    'DATABASE': 'ENGINE=django.db.backends.postgresql_psycopg2:NAME={db[name]}:HOST={db[host]}:USER={db[username]}:PASSWORD={db[password]}:OPTIONS={db[options]}'.format(db=db),
     'SQUAD_ADMINS': variables.get('admin_email'),
     'SQUAD_BASE_URL': 'https://%s' % variables.get('server_name'),
     'SQUAD_CELERY_BROKER_URL': 'amqp://%s' % variables.get('amqp_host', AMQP_HOST),
