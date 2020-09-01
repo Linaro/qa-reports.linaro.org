@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qareports-pod-name
+  labels:
+    app: qareports-pod
+spec:
+  containers:
+  - name: qareports-pod
+    image: squadproject/squad:release
+    imagePullPolicy: "Always"
+    command: ["sh", "-c"]
+    args:
+    - sleep infinity
+
+    envFrom:
+    - secretRef:
+        name: qareports-environment
+
+    resources:
+      requests:
+        memory: "8192M"
+        cpu: "4"
+
+      limits:
+        memory: "8192M"
+        cpu: "4"

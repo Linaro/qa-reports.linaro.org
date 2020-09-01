@@ -28,18 +28,19 @@ qareports_help() {
     echo "Usage: ./qareports $available_envs [command[args]]"
     echo
     echo "Commands:"
+    echo "  pods           show all pods"
+    echo "  upgrade_squad  upgrade SQUAD image in all deployments"
+    echo "  ssh node|pod   ssh into a node or a pod"
+    echo "  k              runs kubectl for k8s specific commands"
+    echo "  run            create a generic qareports pod (4cpu/8G) for admin commands"
     echo "  up             create the entire setup"
     echo "  destroy        destroy the entire setup"
     echo "  list           show all services (e.g. frontend, workers, etc)"
-    echo "  upgrade_squad  upgrade SQUAD image in all deployments"
     echo "  deploy         apply all configuration files"
     echo "  queues [-w]    show all queues"
-    echo "  pods           show all pods"
     echo "  top            show CPU and Memory usage in all pods"
-    echo "  ssh node|pod   ssh into a node or a pod"
     echo "  logs [-f] pod  display logs for a given pod, pass -f to keep following"
     echo "  dashboard      pop up a kubernetes dashboard"
-    echo "  k              runs kubectl for k8s specific commands"
     echo
     echo "Example:"
     echo "  $ ./qareports production upgrade_squad  # probably the most frequent command"
@@ -251,6 +252,25 @@ qareports_pods(){
 qareports_top(){
     echo "Showing pods' stats for $environment"
     k top pods
+}
+
+qareports_run(){
+    pod_name=qareports-pod-$USER
+    echo "Running generic qareports pod for adhoc commands. Delete them with './qareports $environment k delete pod $pod_name'"
+    sed s/qareports-pod-name/$pod_name/ k8s/qareports-pod.yml | k apply -f -
+
+    echo "Waiting for pod and node to be ready"
+    k wait --for=condition=ready --timeout=150s pod/$pod_name  # Wait 2 minutes for migration to complete
+    if [ $? != 0 ]
+    then
+        echo "Failed to start adhoc pod:"
+        k describe pod $pod_name
+        k delete pod $pod_name  # delete failed migration job
+        echo "*** ABORTING !!! ***"
+        exit 1
+    fi
+
+    k exec --stdin --tty $pod_name -- bash
 }
 
 qareports_logs(){
