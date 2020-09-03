@@ -142,7 +142,7 @@ spec:
         imagePullPolicy: "Always"
         command: ["sh", "-c"]
         args:
-        - squad --timeout=60 --workers=8 --fast --log-level DEBUG
+        - squad --timeout=60 --workers=8 --fast --log-level DEBUG --worker-tmp-dir /dev/shm
 
         envFrom:
         - secretRef:
