@@ -235,6 +235,20 @@ resource "aws_security_group" "qareports_nat_instance_security_group" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
+
+    # Allow SSH to Gerrit servers
+    ingress {
+        from_port = 29418
+        to_port = 29418
+        protocol = "tcp"
+        cidr_blocks = ["${aws_subnet.qareports_private_subnet_1.cidr_block}", "${aws_subnet.qareports_private_subnet_2.cidr_block}"]
+    }
+    egress {
+        from_port = 29418
+        to_port = 29418
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
 }
 
 # Create an instance profile to attach QAREPORTS_EKSStagingCIRole to NAT instance so that ci.linaro.org can update staging pods
