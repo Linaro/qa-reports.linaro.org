@@ -5,6 +5,11 @@ set -e
 available_envs="dev|testing|staging|production"
 squad_dockerhub="squadproject/squad"
 
+
+declare -A environment_tag
+environment_tag=( ["testing"]="$squad_dockerhub:testing" ["staging"]="$squad_dockerhub:latest" ["production"]="$squad_dockerhub:release")
+
+
 docker_tag_exists() {
     curl --silent -f -lSL https://index.docker.io/v1/repositories/$squad_dockerhub/tags/$1 > /dev/null
 }
@@ -108,14 +113,14 @@ qareports_destroy() {
 }
 
 qareports_migrate_db() {
+    echo "Migrating $environment"
+    image=${environment_tag[$environment]}
     if [ $# == 1 ]
     then
         image=$1
-        sed "s%squadproject/squad:release%\"$image\"%" k8s/qareports-migration.yml | k apply -f -
-    else
-        k apply -f k8s/qareports-migration.yml  # start job to apply migration, delete when finish
     fi
 
+    sed "s%squadproject/squad:release%\"$image\"%" k8s/qareports-migration.yml | k apply -f -
 
     k wait --for=condition=complete --timeout=1800s job/qareports-migration  # Wait 30 minutes for migration to complete
     if [ $? != 0 ]
@@ -138,6 +143,8 @@ qareports_update_environment_variables(){
 qareports_upgrade_squad() {
     echo "Upgraging $environment"
 
+    image=${environment_tag[$environment]}
+
     if [ $# == 1 ]
     then
         squad_release=$1
@@ -147,19 +154,15 @@ qareports_upgrade_squad() {
             echo "Docker image $image not found! Aborting upgrade..."
             exit 1
         fi
-
-        qareports_migrate_db $image
-
-        k set image deployment/qareports-web-deployment init-qareports-web=$image qareports-web=$image
-        k set image deployment/qareports-worker-deployment qareports-worker=$image
-        k set image deployment/qareports-listener-deployment qareports-listener=$image
-        k set image deployment/qareports-scheduler-deployment qareports-scheduler=$image
-        k set image deployment/qareports-fetch-worker-deployment qareports-fetch-worker=$image
-    else
-        qareports_migrate_db
-        k rollout restart deployment  # Rollout all deployments at once
     fi
 
+    qareports_migrate_db $image
+    k set image deployment/qareports-web-deployment init-qareports-web=$image qareports-web=$image
+    k set image deployment/qareports-worker-deployment qareports-worker=$image
+    k set image deployment/qareports-listener-deployment qareports-listener=$image
+    k set image deployment/qareports-scheduler-deployment qareports-scheduler=$image
+    k set image deployment/qareports-fetch-worker-deployment qareports-fetch-worker=$image
+    k rollout restart deployment  # Rollout all deployments at once
 }
 
 qareports_deploy() {
