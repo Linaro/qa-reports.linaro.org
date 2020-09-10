@@ -260,7 +260,9 @@ qareports_top(){
 qareports_run(){
     pod_name=qareports-pod-$USER
     echo "Running generic qareports pod for adhoc commands. Delete them with './qareports $environment k delete pod $pod_name'"
-    sed s/qareports-pod-name/$pod_name/ k8s/qareports-pod.yml | k apply -f -
+
+    image=${environment_tag[$environment]}
+    sed -e "s/qareports-pod-name/$pod_name/" -e "s%squadproject/squad:release%\"$image\"%" k8s/qareports-pod.yml | k apply -f -
 
     echo "Waiting for pod and node to be ready"
     k wait --for=condition=ready --timeout=150s pod/$pod_name  # Wait 2 minutes for migration to complete
