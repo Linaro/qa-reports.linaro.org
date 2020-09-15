@@ -46,7 +46,7 @@ su - $EP_USER -c "git clone https://github.com/chaws/qa-reports.linaro.org"
 
 
 # Make the endpoint a service
-cat > /etc/systemd/system/ci_endpoint_server.service <<EOF
+cat > /etc/systemd/system/$EP_SERVER.service <<EOF
 [Unit]
 Description=Endpoint server to upgrade testing and staging environments
 
@@ -62,8 +62,8 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl start ci_endpoit_server
-systemctl enable ci_endpoit_server
+systemctl start $EP_SERVER
+systemctl enable $EP_SERVER
 
 
 # Configure apache virtual host
