@@ -34,9 +34,9 @@
 #     * QAREPORTS_EKSFargateRole: role to allow Fargate to manage EC2 resources
 #       * Policies:
 #         * AmazonEKSFargatePodExecutionRolePolicy (aws managed)
-#     * QAREPORTS_EKSStagingCIRole: role to allow ec2 instances SSH'ed from ci.linaro.org to update staging environment
+#     * QAREPORTS_EKSCIRole: role to allow ec2 instances to update staging and testing environment via authenticated request
 #       * Policies:
-#         * QAREPORTS_EKSStagingCIPolicy: policy that allow read and list cluster resources
+#         * QAREPORTS_EKSCIPolicy: policy that allow read and list cluster resources
 #   * 1 CloudWatch log group
 #   * 1 EKS Cluster
 #     * 1 Fargate Profile that select pods under qareports-production and qareports-staging namespaces
@@ -83,11 +83,10 @@ POLICY
 }
 
 #
-#   Role that allows ci.linaro.org to ssh into NAT instance and call
-#   ./qareports staging upgrade
+#   Role that allows external services to call webhooks to upgrade staging and testing environments
 #
-resource "aws_iam_role" "qareports_eks_staging_ci_role" {
-    name = "QAREPORTS_EKSStagingCIRole"
+resource "aws_iam_role" "qareports_eks_ci_role" {
+    name = "QAREPORTS_EKSCIRole"
     description = "Allow EC2 instances manage resources within ${var.cluster_name}"
     force_detach_policies = true
     assume_role_policy = <<POLICY
@@ -104,9 +103,9 @@ resource "aws_iam_role" "qareports_eks_staging_ci_role" {
 POLICY
 }
 
-resource "aws_iam_role_policy" "qareports_eks_staging_ci_policy" {
-    name   = "QAREPORTS_EKSStagingCIPolicy"
-    role       = "${aws_iam_role.qareports_eks_staging_ci_role.id}"
+resource "aws_iam_role_policy" "qareports_eks_ci_policy" {
+    name   = "QAREPORTS_EKSCIPolicy"
+    role       = "${aws_iam_role.qareports_eks_ci_role.id}"
     policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -115,12 +114,22 @@ resource "aws_iam_role_policy" "qareports_eks_staging_ci_policy" {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
+                "eks:ListFargateProfiles",
+                "eks:DescribeNodegroup",
+                "eks:ListNodegroups",
+                "eks:DescribeFargateProfile",
                 "eks:ListTagsForResource",
                 "eks:ListUpdates",
                 "eks:DescribeUpdate",
                 "eks:DescribeCluster"
             ],
             "Resource": "${aws_eks_cluster.qareports_eks_cluster.arn}"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "eks:ListClusters",
+            "Resource": "*"
         }
     ]
 }

@@ -251,12 +251,6 @@ resource "aws_security_group" "qareports_nat_instance_security_group" {
     }
 }
 
-# Create an instance profile to attach QAREPORTS_EKSStagingCIRole to NAT instance so that ci.linaro.org can update staging pods
-resource "aws_iam_instance_profile" "qa_reports_nat_instance_profile" {
-    name = "QAREPORTS_NATInstanceProfile"
-    role = "${aws_iam_role.qareports_eks_staging_ci_role.name}"
-}
-
 resource "aws_instance" "qareports_nat_instance" {
     tags = {
         Name = "QAREPORTS_NAT"

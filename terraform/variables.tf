@@ -18,14 +18,9 @@ variable "db_max_storage"       { type = "string" }
 variable "db_name"              { type = "string" }
 variable "db_username"          { type = "string" }
 variable "db_password"          { type = "string" }
-
-variable "route53_zone_id" {
-    type = "string"
-    default = "Z27NRA2FV79C84"
-}
-
-variable "canonical_dns_name" { type = "string" }
-variable "dns_name" { type = "string" }
+variable "route53_zone_id"      { type = "string" }
+variable "canonical_dns_name"   { type = "string" }
+variable "dns_name"             { type = "string" }
 variable "dns_validation_method" { type = "string" }
 
 data "aws_eks_cluster" "qareports_eks_cluster" {
