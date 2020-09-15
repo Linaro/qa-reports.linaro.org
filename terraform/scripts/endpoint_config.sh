@@ -42,7 +42,7 @@ chmod +x $kubectl_tmp && mv $kubectl_tmp /usr/local/bin/kubectl
 
 
 # Get a copy of qareports deploy scripts
-su - $EP_USER -c "git clone https://github.com/chaws/qa-reports.linaro.org"
+su - $EP_USER -c "git clone https://github.com/linaro/qa-reports.linaro.org"
 
 
 # Make the endpoint a service
