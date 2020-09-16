@@ -15,7 +15,7 @@ variable "region" {
 
 variable "ci_endpoint_url" {
     type = "string"
-    default = "ci-endpoint-qa-reports.ctt.linaro.org"
+    default = "ci-qa-reports.ctt.linaro.org"
 }
 
 variable "route53_zone_id" {

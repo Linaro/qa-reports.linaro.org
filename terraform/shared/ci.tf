@@ -79,7 +79,7 @@ resource "aws_instance" "qareports_ci_endpoint_instance" {
     availability_zone = "${aws_subnet.qareports_public_subnet_1.availability_zone}"
 
     # Place a flask app to respond webhook requests
-    user_data = "${file("${path.module}/../scripts/endpoint_config.sh")}"
+    user_data = "${file("${path.module}/../scripts/ci_config.sh")}"
 
     # Attach role
     iam_instance_profile = "${aws_iam_instance_profile.qareports_ci_endpoint_instance_profile.name}"

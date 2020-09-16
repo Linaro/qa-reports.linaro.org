@@ -7,7 +7,7 @@ EKS_CLUSTER_REGION=us-east-1
 
 # Endpoint settings
 EP_USER=ubuntu
-EP_DNS=ci-endpoint-qa-reports.ctt.linaro.org
+EP_DNS=ci-qa-reports.ctt.linaro.org
 EP_TOKEN=$(openssl rand -hex 16)
 EP_SERVER=ci_endpoint_server
 EP_SERVER_SCRIPT=/home/ubuntu/qa-reports.linaro.org/terraform/scripts/$EP_SERVER.py
