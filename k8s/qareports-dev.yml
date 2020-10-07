@@ -51,3 +51,14 @@ spec:
   type: LoadBalancer
   externalIPs:
   - 172.31.4.240
+
+---
+
+#
+# Create qareports-serviceaccount
+#
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: qareports-serviceaccount
+  namespace: qareports-dev

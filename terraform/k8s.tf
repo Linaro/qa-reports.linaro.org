@@ -36,3 +36,17 @@ resource "kubernetes_service" "qareports_web_service" {
 
     depends_on = ["kubernetes_namespace.qareports_k8s_namespace"]
 }
+
+#
+#   Service account so that Pods can assume roles and assume IAM
+#   roles
+#
+resource "kubernetes_service_account" "qareports_serviceaccount" {
+    metadata {
+        name = "qareports-serviceaccount"
+        namespace = "qareports-${var.environment}"
+        annotations = {
+            "eks.amazonaws.com/role-arn" = "${aws_iam_role.qareports_role.arn}"
+        }
+    }
+}
