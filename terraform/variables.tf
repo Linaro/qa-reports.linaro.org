@@ -22,6 +22,8 @@ variable "route53_zone_id"      { type = "string" }
 variable "canonical_dns_name"   { type = "string" }
 variable "dns_name"             { type = "string" }
 variable "dns_validation_method" { type = "string" }
+variable "openid_provider_arn"  { type = "string" }
+variable "openid_provider_url"  { type = "string" }
 
 data "aws_eks_cluster" "qareports_eks_cluster" {
     name = "${var.eks_cluster_name}"
