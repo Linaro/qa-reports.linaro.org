@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qareports-local-settings
+data:
+  local_settings.py: |-
+    # DO NOT CHANGE THIS MANUALLY
+    try:
+        import boto3
+        import django_storages
+    
+        AWS_S3_REGION_NAME = 'us-east-1'
+        AWS_STORAGE_BUCKET_NAME = '%ENVIRONMENT%-qareports-storage'
+        DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    except ImportError:
+        pass

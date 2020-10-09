@@ -10,11 +10,19 @@ spec:
     metadata:
       name: qareports-migration
     spec:
+      serviceAccount: qareports-serviceaccount
+      securityContext:
+        fsGroup: 0
+
       restartPolicy: Never
       volumes:
       - name: qareports-secret-key
         configMap:
           name: qareports-secret-key
+
+      - name: qareports-local-settings
+        configMap:
+          name: qareports-local-settings
 
       containers:
       - name: qareports-migration
@@ -32,6 +40,10 @@ spec:
         - name: qareports-secret-key
           mountPath: /app/secret.dat
           subPath: secret.dat
+
+        - name: qareports-local-settings
+          mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
+          subPath: local_settings.py
 
         resources:
           requests:

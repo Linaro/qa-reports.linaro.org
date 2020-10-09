@@ -34,6 +34,8 @@ data "template_file" "shared_vars" {
     public_subnet2_id    = "${aws_subnet.qareports_public_subnet_2.id}"
     private_subnet1_cidr = "${aws_subnet.qareports_private_subnet_1.cidr_block}"
     private_subnet2_cidr = "${aws_subnet.qareports_private_subnet_2.cidr_block}"
+    openid_provider_arn  = "${aws_iam_openid_connect_provider.qareports_eks_openid_provider.arn}"
+    openid_provider_url  = "${replace(aws_eks_cluster.qareports_eks_cluster.identity.0.oidc.0.issuer, "https://", "")}"
   }
 }
 resource "local_file" "shared_vars" {
