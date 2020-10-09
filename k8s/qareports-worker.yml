@@ -39,6 +39,10 @@ spec:
         app: qareports-worker
 
     spec:
+      serviceAccount: qareports-serviceaccount
+      securityContext:
+        fsGroup: 0
+
       volumes:
       - name: qareports-secret-key
         configMap:
@@ -47,6 +51,10 @@ spec:
       - name: qareports-ssh-key
         secret:
           secretName: qareports-ssh-key
+
+      - name: qareports-local-settings
+        configMap:
+          name: qareports-local-settings
 
       - name: ssh-folder
         emptyDir: {}
@@ -83,6 +91,10 @@ spec:
         - name: qareports-secret-key
           mountPath: /app/secret.dat
           subPath: secret.dat
+
+        - name: qareports-local-settings
+          mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
+          subPath: local_settings.py
 
         - name: ssh-folder
           mountPath: /app/.ssh

@@ -101,6 +101,10 @@ spec:
         app: qareports-web
 
     spec:
+      serviceAccount: qareports-serviceaccount
+      securityContext:
+        fsGroup: 0
+
       initContainers:
       - name: init-qareports-web
         image: squadproject/squad:release
@@ -166,6 +170,10 @@ spec:
           mountPath: /usr/local/lib/python3.7/dist-packages/linaro_ldap_backends.py
           subPath: linaro_ldap_backends.py
 
+        - name: qareports-local-settings
+          mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
+          subPath: local_settings.py
+
         resources:
           requests:
             memory: "1024M"
@@ -187,6 +195,10 @@ spec:
       - name: qareports-ldap-conf
         configMap:
           name: qareports-ldap-conf
+
+      - name: qareports-local-settings
+        configMap:
+          name: qareports-local-settings
 
       - name: static-files
         emptyDir: {}

@@ -25,6 +25,10 @@ spec:
         configMap:
           name: qareports-secret-key
 
+      - name: qareports-local-settings
+        configMap:
+          name: qareports-local-settings
+
       containers:
       - name: qareports-scheduler
         image: squadproject/squad:release
@@ -41,6 +45,10 @@ spec:
         - name: qareports-secret-key
           mountPath: /app/secret.dat
           subPath: secret.dat
+
+        - name: qareports-local-settings
+          mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
+          subPath: local_settings.py
 
         resources:
           requests:
