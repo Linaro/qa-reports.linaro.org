@@ -180,7 +180,7 @@ spec:
             cpu: "2"
 
           limits:
-            memory: "2048M"
+            memory: "4096M"
             cpu: "2"
 
       volumes:
