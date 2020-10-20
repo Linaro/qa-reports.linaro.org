@@ -54,7 +54,7 @@ db = {
 defaults = {
     'DATABASE': 'ENGINE=django.db.backends.postgresql_psycopg2:NAME={db[name]}:HOST={db[host]}:USER={db[username]}:PASSWORD={db[password]}:OPTIONS={db[options]}'.format(db=db),
     'SQUAD_ADMINS': variables.get('admin_email'),
-    'SQUAD_SEND_ADMIN_ERROR_EMAIL': variables.get('send_admin_notification', False),
+    'SQUAD_SEND_ADMIN_ERROR_EMAIL': variables.get('send_admin_notification', 'False'),
     'SQUAD_BASE_URL': 'https://%s' % variables.get('server_name'),
     'SQUAD_CELERY_BROKER_URL': 'amqp://%s' % variables.get('amqp_host', AMQP_HOST),
     'SQUAD_EMAIL_FROM': variables.get('email_from'),
