@@ -7,7 +7,7 @@ data:
     # DO NOT CHANGE THIS MANUALLY
     try:
         import boto3
-        import django_storages
+        import storages
     
         AWS_S3_REGION_NAME = 'us-east-1'
         AWS_STORAGE_BUCKET_NAME = '%ENVIRONMENT%-qareports-storage'
