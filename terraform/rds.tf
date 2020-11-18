@@ -30,17 +30,21 @@ resource "aws_db_subnet_group" "qareports_rds_subnet_group" {
     }
 }
 
-# TODO: apparently rds was logging every single query
-# this parameter group changes that so that only queries that take
-# more than 500ms are actually logged
 resource "aws_db_parameter_group" "qareports_rds_parameter_group" {
     name        = "${var.environment}-qa-reports-postgresql-params"
     family      = "postgres9.6"
     description = "RDS default cluster parameter group"
 
+    # Log every query that takes more than 1 minute to run
     parameter {
         name  = "log_min_duration_statement"
-        value = 500
+        value = 60000
+    }
+
+    # Keeps logs for a day
+    parameter {
+        name  = "rds.log_retention_period"
+        value = 1440
     }
 }
 
