@@ -39,6 +39,7 @@ spec:
         app: qareports-worker
 
     spec:
+      terminationGracePeriodSeconds: 3600
       serviceAccount: qareports-serviceaccount
       securityContext:
         fsGroup: 0
