@@ -26,3 +26,6 @@ cat <<CONF >/etc/rabbitmq/rabbitmq.config
 CONF
 
 retry systemctl restart rabbitmq-server
+
+# This will only work for RabbitMQ >= 3.6.0
+retry rabbitmqctl set_policy Lazy "" '{"queue-mode":"lazy"}' --apply-to queues

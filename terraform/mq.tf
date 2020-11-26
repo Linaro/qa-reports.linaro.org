@@ -56,7 +56,8 @@ resource "aws_instance" "qareports_rabbitmq_instance" {
     }
 
     # Instance type and size
-    ami = "${var.ami_id}"
+    # us-east-1 bionic 18.04 LTS amd64 hvm:ebs-ssd released 20201123
+    ami = "ami-0b893eef6e21b60a1"
     instance_type = "${var.mq_node_type}"
 
     # Networking and security
