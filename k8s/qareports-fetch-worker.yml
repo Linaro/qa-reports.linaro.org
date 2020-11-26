@@ -57,9 +57,13 @@ spec:
       - name: qareports-fetch-worker
         image: squadproject/squad:release
         imagePullPolicy: "Always"
-        command: ["sh", "-c"]
+        command: ["squad-worker"]
         args:
-        - squad-worker --exclude-queues=ci_poll,ci_quick,core_notification,core_postprocess,core_quick,core_reporting --concurrency=1 --without-mingle
+        - --queues=ci_fetch
+        - --concurrency=1
+        - --max-memory-per-child=4000000
+        - --without-mingle
+        - --without-gossip
 
         envFrom:
         - secretRef:
@@ -76,7 +80,7 @@ spec:
 
         resources:
           requests:
-            memory: "2048M"
+            memory: "5120M"
             cpu: "2"
 
           limits:
