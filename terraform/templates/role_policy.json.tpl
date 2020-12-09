@@ -14,7 +14,9 @@
             ],
             "Resource": [
                 "arn:aws:s3:::${environment}-qareports-storage",
-                "arn:aws:s3:::${environment}-qareports-storage/*"
+                "arn:aws:s3:::${environment}-qareports-storage/*",
+                "arn:aws:s3:::${environment}-qareports-storage-backup",
+                "arn:aws:s3:::${environment}-qareports-storage-backup/*"
             ]
         }
     ]
