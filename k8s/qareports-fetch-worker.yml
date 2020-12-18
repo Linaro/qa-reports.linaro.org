@@ -61,7 +61,7 @@ spec:
         args:
         - --queues=ci_fetch
         - --concurrency=1
-        - --max-memory-per-child=4000000
+        - --max-memory-per-child=2000000
         - --without-mingle
         - --without-gossip
 
@@ -80,9 +80,9 @@ spec:
 
         resources:
           requests:
-            memory: "5120M"
-            cpu: "2"
+            memory: "4096M"
+            cpu: "1"
 
           limits:
-            memory: "5120M"
-            cpu: "2"
+            memory: "4096M"
+            cpu: "1"
