@@ -32,7 +32,7 @@ resource "aws_db_subnet_group" "qareports_rds_subnet_group" {
 
 resource "aws_db_parameter_group" "qareports_rds_parameter_group" {
     name        = "${var.environment}-qa-reports-postgresql-params"
-    family      = "postgres9.6"
+    family      = "postgres12"
     description = "RDS default cluster parameter group"
 
     # Log every query that takes more than 1 minute to run
@@ -46,6 +46,12 @@ resource "aws_db_parameter_group" "qareports_rds_parameter_group" {
         name  = "rds.log_retention_period"
         value = 1440
     }
+
+    # Give 32MB of memory for query workers if postgres ever come to be slow
+    # parameter {
+    #     name  = "work_mem"
+    #     value = 32768
+    # }
 }
 
 resource "aws_db_instance" "qareports_rds_instance" {
@@ -61,7 +67,7 @@ resource "aws_db_instance" "qareports_rds_instance" {
     password = "${var.db_password}"
     availability_zone = "${var.region}a"
     db_subnet_group_name = "${aws_db_subnet_group.qareports_rds_subnet_group.name}"
-    parameter_group_name = "${var.environment == "production" ? "production-qa-reports-postgresql-params" : "default.postgres12"}"
+    parameter_group_name = "${var.environment}-qa-reports-postgresql-params"
     multi_az = false
     backup_retention_period = 7 # days
     backup_window = "23:20-23:50"
