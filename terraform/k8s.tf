@@ -11,12 +11,21 @@ resource "kubernetes_namespace" "qareports_k8s_namespace" {
     }
 }
 
+#
+#   Use a manually-created, ACM-issued, DNS-validated certificate
+#
+data "aws_acm_certificate" "qareports_acm_certificate" {
+  domain      = "${var.canonical_dns_name}"
+  types       = ["AMAZON_ISSUED"]
+  most_recent = true
+}
+
 resource "kubernetes_service" "qareports_web_service" {
     metadata {
         name = "qareports-web-service"
         namespace = "qareports-${var.environment}"
         annotations {
-            "service.beta.kubernetes.io/aws-load-balancer-ssl-cert" = "${aws_acm_certificate.qareports_acm_certificate.arn}"
+            "service.beta.kubernetes.io/aws-load-balancer-ssl-cert" = "${data.aws_acm_certificate.qareports_acm_certificate.arn}"
             "service.beta.kubernetes.io/aws-load-balancer-backend-protocol" = "http"
             "service.beta.kubernetes.io/aws-load-balancer-ssl-ports" = "443"
         }

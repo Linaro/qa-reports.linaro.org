@@ -20,8 +20,6 @@ variable "db_username"          { type = "string" }
 variable "db_password"          { type = "string" }
 variable "route53_zone_id"      { type = "string" }
 variable "canonical_dns_name"   { type = "string" }
-variable "dns_name"             { type = "string" }
-variable "dns_validation_method" { type = "string" }
 variable "openid_provider_arn"  { type = "string" }
 variable "openid_provider_url"  { type = "string" }
 
