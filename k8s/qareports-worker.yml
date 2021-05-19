@@ -110,5 +110,5 @@ spec:
             cpu: "1"
 
           limits:
-            memory: "1024M"
+            memory: "2048M"
             cpu: "1"
