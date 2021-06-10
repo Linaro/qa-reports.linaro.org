@@ -20,6 +20,7 @@ spec:
         app: qareports-scheduler
 
     spec:
+      serviceAccount: qareports-serviceaccount
       volumes:
       - name: qareports-secret-key
         configMap:
