@@ -1,0 +1,35 @@
+#
+#   Defines file to be passed to SQUAD_EXTRA_SETTINGS
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qareports-extra-settings
+data:
+  extra_settings.py: |-
+    # DO NOT CHANGE THIS MANUALLY
+
+    # Read ldap configuration, if there's any
+    try:
+        exec(open("/app/linaro_ldap.py").read())
+    except (IOError, FileNotFoundError):
+        pass
+
+    # Enable health-check endpoint
+    # should enable it in worker as well!
+    try:
+        import health_check
+
+        # This is required by RabbitMQ checker
+        # ref: https://github.com/KristianOellegaard/django-health-check/blob/d08200dd7c01a8781236856b7b4714a15a8ba286/health_check/contrib/rabbitmq/backends.py
+        BROKER_URL = CELERY_BROKER_URL
+        HEALTHCHECK_CELERY_PING_TIMEOUT = 5
+
+        INSTALLED_APPS.append('health_check')
+        INSTALLED_APPS.append('health_check.db')
+        INSTALLED_APPS.append('health_check.contrib.celery')
+        INSTALLED_APPS.append('health_check.contrib.celery_ping')
+        INSTALLED_APPS.append('health_check.contrib.s3boto3_storage')
+        INSTALLED_APPS.append('health_check.contrib.rabbitmq')
+    except ImportError:
+        pass

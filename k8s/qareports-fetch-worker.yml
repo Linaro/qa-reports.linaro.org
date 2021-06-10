@@ -53,6 +53,10 @@ spec:
         configMap:
           name: qareports-local-settings
 
+      - name: qareports-extra-settings
+        configMap:
+          name: qareports-extra-settings
+
       containers:
       - name: qareports-fetch-worker
         image: squadproject/squad:release
@@ -69,6 +73,11 @@ spec:
         - secretRef:
             name: qareports-environment
 
+        # Inject health-check settings
+        env:
+        - name: SQUAD_EXTRA_SETTINGS
+          value: "/app/extra_settings.py"
+
         volumeMounts:
         - name: qareports-secret-key
           mountPath: /app/secret.dat
@@ -77,6 +86,10 @@ spec:
         - name: qareports-local-settings
           mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
           subPath: local_settings.py
+
+        - name: qareports-extra-settings
+          mountPath: /app/extra_settings.py
+          subPath: extra_settings.py
 
         resources:
           requests:

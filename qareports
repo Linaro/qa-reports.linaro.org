@@ -152,6 +152,11 @@ qareports_update_local_settings(){
     sed "s/%ENVIRONMENT%/${environment}/" k8s/qareports-local-settings.yml | k apply -f -
 }
 
+qareports_update_extra_settings(){
+    echo "Updating extra_settings.py for $environment"
+    k apply -f k8s/qareports-extra-settings.yml
+}
+
 qareports_upgrade_squad() {
     echo "Upgraging $environment"
 

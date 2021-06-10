@@ -129,7 +129,7 @@ spec:
         # Inject ldap into container
         env:
         - name: SQUAD_EXTRA_SETTINGS
-          value: "/app/linaro_ldap.py"
+          value: "/app/extra_settings.py"
 
         volumeMounts:
         - name: qareports-secret-key
@@ -147,6 +147,10 @@ spec:
         - name: qareports-local-settings
           mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
           subPath: local_settings.py
+
+        - name: qareports-extra-settings
+          mountPath: /app/extra_settings.py
+          subPath: extra_settings.py
 
         resources:
           requests:
@@ -199,6 +203,10 @@ spec:
       - name: qareports-local-settings
         configMap:
           name: qareports-local-settings
+
+      - name: qareports-extra-settings
+        configMap:
+          name: qareports-extra-settings
 
       - name: static-files
         emptyDir: {}
