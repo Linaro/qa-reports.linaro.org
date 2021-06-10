@@ -47,6 +47,30 @@ resource "kubernetes_service" "qareports_web_service" {
 }
 
 #
+#   Secret to store docker registry's credentials
+#
+resource "kubernetes_secret" "qareports_docker_credentials" {
+    metadata {
+        name = "qareports-docker-credentials"
+        namespace = "qareports-${var.environment}"
+    }
+
+    data = {
+        ".dockerconfigjson" = <<DOCKER
+{
+  "auths": {
+    "${var.docker_registry}": {
+      "auth": "${base64encode("${var.docker_username}:${var.docker_password}")}"
+    }
+  }
+}
+DOCKER
+    }
+
+    type = "kubernetes.io/dockerconfigjson"
+}
+
+#
 #   Service account so that Pods can assume roles and assume IAM
 #   roles
 #
@@ -58,4 +82,11 @@ resource "kubernetes_service_account" "qareports_serviceaccount" {
             "eks.amazonaws.com/role-arn" = "${aws_iam_role.qareports_role.arn}"
         }
     }
+
+    # Set the secret holding docker credentials, see kubernetes_secret.qareports_docker_credentials
+    image_pull_secret {
+        name = "qareports-docker-credentials"
+    }
+
+    depends_on = ["kubernetes_secret.qareports_docker_credentials"]
 }

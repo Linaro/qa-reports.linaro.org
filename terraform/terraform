@@ -31,6 +31,9 @@ else
     export TF_VAR_db_name=$(../scripts/ansible-vault view ../secrets/${environment}     | grep ^database_name     | awk '{print $2}')
     export TF_VAR_db_username=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^database_username | awk '{print $2}')
     export TF_VAR_db_password=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^database_password | awk '{print $2}')
+    export TF_VAR_docker_registry=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^docker_registry | awk '{print $2}')
+    export TF_VAR_docker_username=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^docker_username | awk '{print $2}')
+    export TF_VAR_docker_password=$(../scripts/ansible-vault view ../secrets/${environment} | grep ^docker_password | awk '{print $2}')
 fi
 
 export TF_DATA_DIR=.terraform_${environment}
