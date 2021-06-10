@@ -115,32 +115,6 @@ spec:
           mountPath: /qareports_static
 
       containers:
-      - name: apache2
-        image: httpd:2.4
-        command: ["sh", "-c"]
-        args:
-        - cat qareports.conf >> conf/httpd.conf && httpd -D FOREGROUND
-
-        ports:
-        - containerPort: 80
-
-        volumeMounts:
-        - name: qareports-web-apache-conf
-          mountPath: /usr/local/apache2/qareports.conf
-          subPath: qareports.conf
-
-        - name: static-files
-          mountPath: /qareports_static
-
-        resources:
-          requests:
-            memory: "128M"
-            cpu: "250m"
-
-          limits:
-            memory: "512M"
-            cpu: "500m"
-
       - name: qareports-web
         image: squadproject/squad:release
         imagePullPolicy: "Always"
@@ -182,6 +156,32 @@ spec:
           limits:
             memory: "4096M"
             cpu: "2"
+
+      - name: apache2
+        image: httpd:2.4
+        command: ["sh", "-c"]
+        args:
+        - cat qareports.conf >> conf/httpd.conf && httpd -D FOREGROUND
+
+        ports:
+        - containerPort: 80
+
+        volumeMounts:
+        - name: qareports-web-apache-conf
+          mountPath: /usr/local/apache2/qareports.conf
+          subPath: qareports.conf
+
+        - name: static-files
+          mountPath: /qareports_static
+
+        resources:
+          requests:
+            memory: "128M"
+            cpu: "250m"
+
+          limits:
+            memory: "512M"
+            cpu: "500m"
 
       volumes:
       - name: qareports-secret-key
