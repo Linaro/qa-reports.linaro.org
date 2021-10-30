@@ -113,6 +113,15 @@ Usually a command to describe what is going on on a pod is
 Starting celery with '--without-mingle' prevented it from crashing everytime a new worker was started in parallel.
 More info: https://stackoverflow.com/questions/55249197/what-are-the-consequences-of-disabling-gossip-mingle-and-heartbeat-for-celery-w
 
+## Never-ending tasks in ci_fetch queue
+
+Sometimes celery suffers from `celery_chord_unlock` tasks that never reach a timeout and causes the fetch-workers to
+do useless work. I still have not found the reason for this yet, but until then, it's convenient to purge the ci_fetch queue.
+
+1. First kill all fetch-workers
+2. ssh -i tmp/qareports_private_ssh_key `cat terraform/generated/production_rabbitmq_host_public` (you'll need to run `./qareports production queues` first)
+3. sudo rabbitmqctl purge_queue ci_fetch
+
 ## Emails
 
 We're currently using AWS Simple Email Service aka SES to send emails. On an account that SES was never used, AWS puts it under sandbox
