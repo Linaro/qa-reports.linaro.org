@@ -122,6 +122,15 @@ do useless work. I still have not found the reason for this yet, but until then,
 2. ssh -i tmp/qareports_private_ssh_key `cat terraform/generated/production_rabbitmq_host_public` (you'll need to run `./qareports production queues` first)
 3. sudo rabbitmqctl purge_queue ci_fetch
 
+## Zombie pods / pods in endless terminating state
+
+Sometimes pods act weird and enter a terminating state where it hangs forever.
+You can force-terminate this pod by running
+
+```
+./qareports production k delete pod --grace-period=0 --force <pod-name>
+```
+
 ## Emails
 
 We're currently using AWS Simple Email Service aka SES to send emails. On an account that SES was never used, AWS puts it under sandbox
