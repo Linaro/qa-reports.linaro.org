@@ -18,6 +18,9 @@ spec:
   containers:
   - name: qareports-pod
     image: squadproject/squad:release
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsUser: 0
     imagePullPolicy: "Always"
     command: ["sh", "-c"]
     args:
