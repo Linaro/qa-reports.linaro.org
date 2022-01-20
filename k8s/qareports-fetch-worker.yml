@@ -65,7 +65,7 @@ spec:
         args:
         - --queues=ci_fetch
         - --concurrency=1
-        - --max-memory-per-child=2000000
+        - --max-memory-per-child=2500000
         - --without-mingle
         - --without-gossip
 
