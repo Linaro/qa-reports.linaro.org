@@ -1,5 +1,17 @@
 #!/bin/sh
 
+# In order to update the people who can decrypt the password
+# one must first be able to decrypt it, then encrypt it again
+# with the updated list of keys. You should have all keys on
+# the local keyring before re-encrypting the vault.
+# gpg --encrypt \
+#     --recipient charles.oliveira@linaro.org \
+#     --recipient justin.cook@linaro.org      \
+#     --recipient kelley.spoon@linaro.org     \
+#     --recipient ben.copeland@linaro.org     \
+#     --recipient amro.hassaan@linaro.org     \
+#     <password-file>
+
 basedir=$(dirname $0)
 passwd_file=$basedir/../secrets/vault.gpg
 
