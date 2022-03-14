@@ -4,4 +4,6 @@ set -eu
 
 basedir=$(dirname $0)
 vault_password_file=${ANSIBLE_VAULT_PASSWORD_FILE:-"$basedir/vault-passwd"}
-exec ansible-vault --vault-password-file=$vault_password_file "$@"
+action=$1
+shift
+exec ansible-vault $action --vault-pass-file=$vault_password_file "$@"
