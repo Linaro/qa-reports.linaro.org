@@ -42,7 +42,7 @@ spec:
           subPath: secret.dat
 
         - name: qareports-local-settings
-          mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
+          mountPath: /usr/local/lib/python3.9/dist-packages/squad/local_settings.py
           subPath: local_settings.py
 
         resources:

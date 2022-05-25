@@ -141,11 +141,11 @@ spec:
           subPath: linaro_ldap.py
 
         - name: qareports-ldap-conf
-          mountPath: /usr/local/lib/python3.7/dist-packages/linaro_ldap_backends.py
+          mountPath: /usr/local/lib/python3.9/dist-packages/linaro_ldap_backends.py
           subPath: linaro_ldap_backends.py
 
         - name: qareports-local-settings
-          mountPath: /usr/local/lib/python3.7/dist-packages/squad/local_settings.py
+          mountPath: /usr/local/lib/python3.9/dist-packages/squad/local_settings.py
           subPath: local_settings.py
 
         - name: qareports-extra-settings
