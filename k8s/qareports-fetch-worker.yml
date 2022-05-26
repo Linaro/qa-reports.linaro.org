@@ -8,7 +8,7 @@ metadata:
   name: qareports-fetch-worker-autoscale
 spec:
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 35
   scaleTargetRef:
     apiVersion: apps/v1
