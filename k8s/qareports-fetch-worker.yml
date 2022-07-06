@@ -8,8 +8,8 @@ metadata:
   name: qareports-fetch-worker-autoscale
 spec:
   minReplicas: 1
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 35
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 15
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
@@ -64,8 +64,8 @@ spec:
         command: ["squad-worker"]
         args:
         - --queues=ci_fetch
-        - --concurrency=1
-        - --max-memory-per-child=2500000
+        - --concurrency=12
+        - --max-memory-per-child=80000
         - --without-mingle
         - --without-gossip
 
@@ -93,9 +93,9 @@ spec:
 
         resources:
           requests:
-            memory: "4096M"
+            memory: "2048M"
             cpu: "1"
 
           limits:
-            memory: "4096M"
+            memory: "2048M"
             cpu: "1"
