@@ -8,6 +8,30 @@
 
 set -eu
 
+# Wrapper for a specific Terraform version, as currently it's using an older version
+TOP=$(pwd)
+
+update_terraform()
+{
+    export TFVERS=0.11.15
+    export PATH=$TOP/.bin:$PATH
+    if [ ! -x $TOP/.bin/terraform_${TFVERS} ]
+    then
+        (
+        mkdir -p $TOP/.bin/
+        cd $TOP/.bin
+        wget -q https://releases.hashicorp.com/terraform/${TFVERS}/terraform_${TFVERS}_linux_amd64.zip
+        unzip -o terraform_${TFVERS}_linux_amd64.zip
+        mv terraform terraform_${TFVERS}
+        chmod a+x terraform_${TFVERS}
+        ln -sf terraform_${TFVERS} terraform
+        rm terraform_${TFVERS}_linux_amd64.zip
+        )
+    fi
+}
+
+update_terraform
+
 environment=$1
 re="^(testing|staging|production|shared)$"
 if [[ ! $environment =~ $re ]]
